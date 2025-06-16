@@ -1,0 +1,10 @@
+{
+  "domain": "hometech",
+  "name": "Tablet",
+  "version": "1.0.0",
+  "documentation": "https://github.com/Andreap1994/hometech",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": ["Andreap1994"],
+  "iot_class": "cloud_polling"
+}
