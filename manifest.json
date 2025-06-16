@@ -1,8 +1,7 @@
 {
   "domain": "hometech",
-  "name": "Tablet",
-  "version": "1.0.0",
-  "documentation": "https://github.com/Andreap1994/hometech",
+  "name": "Dashboard",
+  "documentation": "https://github.com/Andreap1994/hometech-dashboard",
   "requirements": [],
   "dependencies": [],
   "codeowners": ["Andreap1994"],
