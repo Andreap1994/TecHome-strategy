@@ -1,1 +1,4813 @@
+kiosk_mode:
+  user_settings:
+    - users:
+        - Federica
+      hide_header: true
+      ignore_disable_km: true
+button_card_templates:
+  row_space_5:
+    template: no_background
+    styles:
+      card:
+        - height: 5px
+        - padding: 0px
+  row_space_10:
+    template: no_background
+    styles:
+      card:
+        - height: 10px
+        - padding: 0px
+  empty_card:
+    template: no_background
+    color_type: blank-card
+  no_background:
+    styles:
+      card:
+        - background-color: rgba(0, 0, 0, 0.0)
+        - box-shadow: none
+  row_space_20:
+    template: no_background
+    styles:
+      card:
+        - height: 20px
+        - padding: 0px
+  card_header:
+    styles:
+      card:
+        - height: 80px
+  sensor_card:
+    layout: icon_name_state2nd
+    show_state: true
+    styles:
+      card:
+        - padding-top: 2%
+        - padding-bottom: 2%
+      state:
+        - font-size: 140%
+        - font-weight: bold
+        - justify-self: start
+        - align-self: center
+      name:
+        - font-size: 85%
+        - justify-self: start
+        - color: var(--secondary-text-color)
+    tap_action:
+      action: none
+  button_text_label:
+    template: feedback_click
+    show_label: true
+    show_icon: false
+    styles:
+      card:
+        - height: 60px
+      name:
+        - font-size: 90%
+        - color: var(--secondary-text-color)
+        - margin-bottom: 2px
+      label:
+        - margin-top: 2px
+        - font-weight: bold
+  feedback_click:
+    styles:
+      card:
+        - '--mdc-ripple-color': var(--paper-item-icon-active-color)
+        - '--mdc-ripple-press-opacity': 0.2
+  button_icon_square:
+    template: feedback_click
+    size: 60%
+    show_name: false
+    aspect_ratio: 1/1
+  action_spotify_room:
+    entity: input_text.spotify_room
+    styles:
+      card:
+        - height: 80px
+      name:
+        - margin-bottom: 5px
+    tap_action:
+      action: call-service
+      service: script.spotify_set_room
+      service_data:
+        room: '[[[ return variables.room ]]]'
+    state:
+      - value: '[[[ return variables.room ]]]'
+        styles:
+          icon:
+            - color: var(--paper-item-icon-active-color)
+            - font-weight: bold
+          name:
+            - color: var(--paper-item-icon-active-color)
+            - font-weight: bold
+  button_horizontal:
+    layout: icon_name
+    show_icon: true
+    styles:
+      card:
+        - height: 60px
+      name:
+        - padding-right: 5px
+views:
+  - title: Home
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: custom:mushroom-template-card
+            primary: |-
+              {% set time = now().hour %} 
 
+              {% if (time >= 18) %} Buonasera, {{user}}! 
+
+              {% elif (time >= 12) %} Buon pomeriggio, {{user}}! 
+
+              {% elif (time >= 5) %} Buongiorno, {{user}}! 
+
+              {% else %} Ciao, {{user}}! {% endif %} 
+            icon: mdi:hand-wave
+            icon_color: orange
+            tap_action:
+              action: none
+            double_tap_action:
+              action: none
+            hold_action:
+              action: none
+            fill_container: false
+            layout: horizontal
+            secondary: >-
+              Interna: {{ states('sensor.t_u_casa_temperature') }} °C | {{
+              states('sensor.t_u_casa_humidity') }} %
+            badge_icon: ''
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: '#luce'
+                double_tap_action:
+                  action: perform-action
+                  target:
+                    area_id:
+                      - bagno
+                      - camera_da_letto
+                      - cucina
+                      - ingresso
+                      - lavanderia
+                      - soggiorno
+                      - balcone
+                  perform_action: light.turn_off
+                  data: {}
+                icon: mdi:lamps-outline
+                icon_color: amber
+                content: >-
+                  {% set entities = [states['light.luce_bagno'],
+                  states['light.luce_camera'], states['light.led_cucina_rgb'],
+                  states['light.luce_cucina'],
+                  states['light.led_cucina_white'],states['light.led_cucina'],
+                  states['light.luce_ingresso'],
+                  states['light.luce_lavanderia'], states['light.luce_sala'],
+                  states['light.led_divano_s'], states['light.led_divano_c'],
+                  states['light.led_divano_d']] %} {{ entities |
+                  selectattr('state','eq','on') | list | count }}
+              - type: template
+                icon: mdi:blinds-horizontal
+                icon_color: cyan
+                content: >-
+                  {% set entities = [states['cover.tapparella_camera'],
+                  states['cover.tapparella_sala']] %}{{ entities |
+                  selectattr('state','eq','open') | list | count }}
+                tap_action:
+                  action: navigate
+                  navigation_path: '#sala_tapparella'
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: call-service
+                  service: cover.close_cover
+                  target:
+                    area_id:
+                      - soggiorno
+                      - camera
+              - type: template
+                icon: mdi:home-thermometer-outline
+                icon_color: orange
+                content: >-
+                  {% set entities = [states['climate.termostato_camera'],
+                  states['climate.termostato_sala']] %} {{ entities |
+                  selectattr('state','ne','off') | list | count }}
+                tap_action:
+                  action: navigate
+                  navigation_path: '#sala_termostato'
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: call-service
+                  service: climate.turn_off
+                  target:
+                    device_id:
+                      - 053c0aa0230d0e8da412c628de6392d4
+                      - b7bb0ef92d176590c55e96e37e101d8f
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: '#automazione'
+                icon: mdi:robot
+                icon_color: green
+                content: |-
+                  {% set entities = [
+                    states['switch.schedule_tapparella_sala'], states['switch.schedule_tapparella_camera'], states['switch.schedule_luce_ingresso']] %} 
+                  {{ entities | selectattr('state','eq','on') | list | count }}
+              - type: template
+                icon: mdi:leak
+                icon_color: blue
+                content: ''
+                tap_action:
+                  action: navigate
+                  navigation_path: '#sensore'
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: call-service
+                  service: switch.turn_off
+                  target:
+                    entity_id: switch.presa_smart
+            alignment: center
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: '#energia_annuale'
+                icon: mdi:home-lightning-bolt-outline
+                icon_color: amber
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: '#planimetria'
+                icon: mdi:floor-plan
+                icon_color: red
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: '#musica'
+                icon: mdi:home-sound-out-outline
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: '#j.a.r.v.i.s'
+                icon: mdi:raspberry-pi
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: /config
+                icon: mdi:cog
+                icon_color: grey
+            alignment: center
+          - type: custom:swipe-card
+            parameters:
+              effect: coverflow
+              autoHeight: false
+              autoplay:
+                delay: 10000
+            cards:
+              - type: custom:clock-weather-card
+                entity: weather.forecast_casa
+                sun_entity: sun.sun
+                temperature_sensor: sensor.outdoor_temm
+                humidity_sensor: sensor.outdoor_humidity
+                weather_icon_type: line
+                animated_icon: true
+                forecast_rows: 4
+                time_pattern: HH:mm
+                time_format: 24
+                date_pattern: ccc d.MM.yy
+                hide_today_section: false
+                hide_forecast_section: false
+                show_humidity: false
+                hide_clock: true
+                hide_date: true
+                hourly_forecast: false
+                use_browser_time: false
+                time_zone: null
+              - type: custom:horizon-card
+          - type: custom:mushroom-alarm-control-panel-card
+            states: []
+            fill_container: false
+            entity: alarm_control_panel.allarme
+            icon: mdi:shield-home-outline
+            show_keypad: false
+            layout: horizontal
+          - type: tile
+            entity: todo.lista_della_spesa
+            show_entity_picture: true
+            vertical: false
+            tap_action:
+              action: navigate
+              navigation_path: /todo
+            name: Lista Spesa
+          - type: tile
+            tap_action:
+              action: call-service
+              service: shopping_list.complete_all
+              target: {}
+            icon: mdi:delete
+            name: S/Carrello
+            hide_state: true
+            entity: todo.lista_della_spesa
+            show_entity_picture: false
+            color: red
+            icon_tap_action:
+              action: call-service
+              service: shopping_list.clear_completed_items
+              target: {}
+          - square: true
+            type: grid
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: custom:button-card
+                    entity: lock.smart_lock_door
+                    icon: mdi:door
+                    aspect_ratio: 4/2
+                    state:
+                      - value: locked
+                        color: red
+                        name: Porta
+                      - value: unlocked
+                        color: green
+                        name: Porta
+                        icon: mdi:door-open
+                        styles:
+                          icon:
+                            - animation: blink 2s ease infinite
+                    tap_action:
+                      action: toggle
+                  - type: custom:button-card
+                    entity: null
+                    icon: mdi:trophy-outline
+                    name: Sport
+                    aspect_ratio: 4/2
+                    tap_action:
+                      action: navigate
+                      navigation_path: '#serie_A'
+              - type: vertical-stack
+                cards:
+                  - type: custom:button-card
+                    entity: button.ingresso_open_door
+                    icon: mdi:key-chain-variant
+                    aspect_ratio: 4/2
+                    name: Portone
+                    tap_action:
+                      action: toggle
+            columns: 2
+            grid_options:
+              columns: 12
+              rows: 2
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#planimetria'
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+              - type: picture-elements
+                image: local/floorplan/casa_giorno.png
+                elements:
+                  - type: image
+                    entity: light.luce_ingresso
+                    hold_action: none
+                    state_image:
+                      'off': /local/floorplan/bottone.png
+                      'on': /local/floorplan/ingresso1.png
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 100%
+                    tap_action: none
+                  - type: image
+                    entity: light.luce_cucina
+                    hold_action: none
+                    state_image:
+                      'off': /local/floorplan/bottone.png
+                      'on': /local/floorplan/cucina1.png
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 100%
+                    tap_action: none
+                  - type: image
+                    entity: light.luce_bagno
+                    hold_action: none
+                    state_image:
+                      'off': /local/floorplan/bottone.png
+                      'on': /local/floorplan/bagno1.png
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 100%
+                    tap_action: none
+                  - type: image
+                    entity: light.luce_lavanderia
+                    hold_action: none
+                    state_image:
+                      'off': /local/floorplan/bottone.png
+                      'on': /local/floorplan/lavanderia1.png
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 100%
+                    tap_action: none
+                  - type: image
+                    entity: light.luce_camera
+                    hold_action: none
+                    state_image:
+                      'off': /local/floorplan/bottone.png
+                      'on': /local/floorplan/camera1.png
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 100%
+                    tap_action: none
+                  - type: image
+                    entity: light.luce_sala
+                    hold_action: none
+                    state_image:
+                      'off': /local/floorplan/bottone.png
+                      'on': /local/floorplan/sala1.png
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 100%
+                    tap_action: none
+                  - type: image
+                    entity: light.luce_balcone
+                    hold_action: none
+                    state_image:
+                      'off': /local/floorplan/bottone.png
+                      'on': /local/floorplan/balcone1.png
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 100%
+                    tap_action: none
+                  - type: image
+                    entity: light.luce_ingresso
+                    image: /local/floorplan/bottone.png
+                    style:
+                      left: 32%
+                      top: 20%
+                    tap_action:
+                      action: toggle
+                  - type: image
+                    entity: light.luce_cucina
+                    image: /local/floorplan/bottone.png
+                    style:
+                      left: 45%
+                      top: 20%
+                    tap_action:
+                      action: toggle
+                  - type: image
+                    entity: light.luce_bagno
+                    image: /local/floorplan/bottone.png
+                    style:
+                      left: 65%
+                      top: 20%
+                    tap_action:
+                      action: toggle
+                  - type: image
+                    entity: light.luce_lavanderia
+                    image: /local/floorplan/bottone.png
+                    style:
+                      left: 67%
+                      top: 15%
+                    tap_action:
+                      action: toggle
+                  - type: image
+                    entity: light.luce_camera
+                    image: /local/floorplan/bottone.png
+                    style:
+                      left: 65%
+                      top: 65%
+                    tap_action:
+                      action: toggle
+                  - type: image
+                    entity: light.luce_sala
+                    image: /local/floorplan/bottone.png
+                    style:
+                      left: 45%
+                      top: 65%
+                    tap_action:
+                      action: toggle
+                  - type: image
+                    entity: light.luce_balcone
+                    image: /local/floorplan/bottone.png
+                    style:
+                      left: 45%
+                      top: 65%
+                    tap_action:
+                      action: toggle
+                  - type: state-icon
+                    entity: light.luce_ingresso
+                    style:
+                      left: 32%
+                      top: 30%
+                      tap_action: null
+                    tap_action:
+                      action: toggle
+                  - type: state-icon
+                    entity: light.luce_cucina
+                    style:
+                      left: 47%
+                      top: 35%
+                      tap_action: null
+                    tap_action:
+                      action: toggle
+                  - type: state-icon
+                    entity: light.luce_bagno
+                    style:
+                      left: 63%
+                      top: 27%
+                      tap_action: null
+                    tap_action:
+                      action: toggle
+                  - type: state-icon
+                    entity: light.luce_lavanderia
+                    style:
+                      left: 67%
+                      top: 15%
+                      tap_action: null
+                    tap_action:
+                      action: toggle
+                  - type: state-icon
+                    entity: light.luce_camera
+                    style:
+                      left: 66%
+                      top: 64%
+                      tap_action: null
+                    tap_action:
+                      action: toggle
+                  - type: state-icon
+                    entity: light.luce_sala
+                    style:
+                      left: 47%
+                      top: 63%
+                      tap_action: null
+                    tap_action:
+                      action: toggle
+                  - type: state-icon
+                    entity: light.luce_balcone
+                    style:
+                      left: 54%
+                      top: 88%
+                    tap_action:
+                      action: toggle
+                  - type: state-label
+                    entity: weather.forecast_casa
+                    style:
+                      background-color: rgba(61,116,254,0.3)
+                      border-radius: 0%
+                      color: '#fff'
+                      font-size: 13px
+                      font-weight: bold
+                      left: 16%
+                      text-align: center
+                      top: 10%
+                camera_view: auto
+                state_filter: {}
+                dark_mode_image: local/floorplan/casa_notte.png
+                dark_mode_filter: >-
+                  {% set entities =
+                  [states['light.luce_bagno'],states['light.luce_camera'],states['light.led_cucina_rgb'],states['light.luce_cucina'],states['light.led_cucina_white'],states['light.led_cucina'],states['light.luce_ingresso'],states['light.luce_lavanderia'],states['light.luce_sala'],states['light.led_divano_s'],states['light.led_divano_c'],states['light.led_divano_d']]
+                  %} {{ entities | selectattr('state','eq','on') | list | count
+                  }}
+                grid_options:
+                  columns: full
+                  rows: auto
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#F1'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 1
+                rows: 1
+                margin: 7px
+                width_desktop: 1000px
+                margin_top_mobile: 1px
+                show_header: false
+              - type: vertical-stack
+                cards:
+                  - type: custom:formulaone-card
+                    card_type: countdown
+                  - type: custom:formulaone-card
+                    card_type: next_race
+                    show_raceinfo: true
+                    actions:
+                      tap_action:
+                        action: navigate
+                        navigation_path: /lovelace/overview
+                  - type: custom:formulaone-card
+                    card_type: driver_standings
+                    title: Driver Standings
+                  - type: custom:bubble-card
+                    card_type: horizontal-buttons-stack
+                    auto_order: true
+                    1_name: Calcio
+                    1_icon: mdi:soccer-field
+                    1_link: '#serie_A'
+                    1_entity: light.living_room
+                    1_pir_sensor: binary_sensor.living_room_motion
+                    2_name: Formula 1
+                    2_icon: mdi:flag-checkered
+                    2_link: '#F1'
+                    2_entity: light.kitchen
+                    2_pir_sensor: binary_sensor.kitchen_motion
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#serie_A'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 1
+                rows: 1
+                margin: 7px
+                width_desktop: 1000px
+                margin_top_mobile: 1px
+                show_header: false
+              - type: custom:teamtracker-card
+                entity: sensor.serie_a_inter
+                outline: false
+                show_league: false
+                debug: false
+                show_rank: true
+                show_timeouts: true
+                card_title: ''
+                bottom_url: ''
+              - type: custom:calcio-live-classifica
+                entity: sensor.calciolive_classifica_italian_serie_a
+                max_teams_visible: 10
+                hide_header: true
+                selected_group: 2025-2026 Italian Serie A
+              - type: custom:calcio-live-matches
+                entity: sensor.calciolive_all_mixed_internazionale
+                max_events_visible: 5
+                max_events_total: 500
+                hide_past_days: 0
+                show_finished_matches: true
+                hide_header: true
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Calcio
+                1_icon: mdi:soccer-field
+                1_link: '#serie_A'
+                1_entity: light.living_room
+                1_pir_sensor: binary_sensor.living_room_motion
+                2_name: Formula 1
+                2_icon: mdi:flag-checkered
+                2_link: '#F1'
+                2_entity: light.kitchen
+                2_pir_sensor: binary_sensor.kitchen_motion
+      - type: grid
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-entity-card
+                entity: person.andrea
+                primary_info: name
+                secondary_info: state
+                layout: horizontal
+                fill_container: true
+                icon_type: entity-picture
+            grid_options:
+              columns: 6
+              rows: auto
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-entity-card
+                primary_info: name
+                secondary_info: state
+                layout: horizontal
+                fill_container: true
+                icon_type: entity-picture
+                entity: person.federica
+            grid_options:
+              columns: 6
+              rows: auto
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: sensor.iphone_di_andrea_battery_level
+                icon: mdi:battery-50
+              - type: template
+                entity: sensor.iphone_di_andrea_connection_type
+                content: >-
+                  {% if is_state('sensor.iphone_di_andrea_connection_type',
+                  'Wi-Fi') %}Wi-Fi{% else %}Cellulare{% endif %} 
+                icon: >-
+                  {% if is_state('sensor.iphone_di_andrea_connection_type',
+                  'Wi-Fi') %}mdi:wifi{% else %}mdi:network-strength-3{% endif %}
+                tap_action:
+                  action: more-info
+              - type: template
+                entity: sensor.iphone_di_andrea_battery_state
+                content: >-
+                  {% if is_state('sensor.iphone_di_andrea_battery_state', 'Not
+                  Charging') %}Scollegato{% else %}Collegato{% endif %} 
+                icon: >-
+                  {% if is_state('sensor.iphone_di_andrea_battery_state', 'Not
+                  Charging') %}mdi:power-plug-off{% else %}mdi:power-plug{%
+                  endif %}
+                icon_color: ''
+                tap_action:
+                  action: more-info
+            alignment: center
+            grid_options:
+              columns: 6
+              rows: auto
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: sensor.federica_battery_level
+                icon: mdi:battery-50
+              - type: template
+                entity: sensor.federica_connection_type
+                content: >-
+                  {% if is_state('sensor.federica_connection_type', 'Wi-Fi')
+                  %}Wi-Fi{% else %}Cellulare{% endif %} 
+                icon: >-
+                  {% if is_state('sensor.federica_connection_type', 'Wi-Fi')
+                  %}mdi:wifi{% else %}mdi:network-strength-3{% endif %}
+                tap_action:
+                  action: more-info
+              - type: template
+                entity: sensor.federica_battery_state
+                content: >-
+                  {% if is_state('sensor.federica_battery_state', 'Not
+                  Charging') %}Scollegato{% else %}Collegato{% endif %} 
+                icon: >-
+                  {% if is_state('sensor.federica_battery_state', 'Not
+                  Charging') %}mdi:power-plug-off{% else %}mdi:power-plug{%
+                  endif %}
+                icon_color: ''
+                tap_action:
+                  action: more-info
+            alignment: center
+            grid_options:
+              columns: 6
+              rows: auto
+          - type: custom:swipe-card
+            parameters:
+              effect: coverflow
+            cards:
+              - initial_view: listWeek
+                type: calendar
+                entities:
+                  - calendar.eventi
+                  - calendar.andrea
+                  - calendar.condiviso
+                  - calendar.federica
+                  - calendar.lavoro
+              - type: logbook
+                target:
+                  entity_id:
+                    - alarm_control_panel.allarme
+                  label_id:
+                    - luci
+                    - termostato
+                    - tapparelle
+                    - porta
+                    - telecamera
+                hours_to_show: 24
+                grid_options: null
+                columns: 12
+                rows: 8
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#luce'
+                width_desktop: 1000px
+                show_header: false
+              - square: true
+                type: grid
+                cards:
+                  - type: vertical-stack
+                    cards:
+                      - type: vertical-stack
+                        cards:
+                          - type: horizontal-stack
+                            cards:
+                              - type: custom:mushroom-title-card
+                                title: Ingresso
+                          - type: custom:slider-button-card
+                            entity: light.luce_ingresso
+                            slider:
+                              direction: bottom-top
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: false
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: false
+                              tap_action:
+                                action: toggle
+                        grid_options:
+                          columns: 12
+                          rows: 2
+                      - type: vertical-stack
+                        cards:
+                          - type: horizontal-stack
+                            cards:
+                              - type: custom:mushroom-title-card
+                                title: Cucina
+                          - type: custom:slider-button-card
+                            entity: light.luce_cucina
+                            slider:
+                              direction: bottom-top
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: false
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                          - type: custom:slider-button-card
+                            entity: light.led_cucina_rgb
+                            slider:
+                              direction: left-right
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                          - type: custom:slider-button-card
+                            entity: light.led_cucina_white
+                            slider:
+                              direction: left-right
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                  - type: vertical-stack
+                    cards:
+                      - type: vertical-stack
+                        cards:
+                          - type: horizontal-stack
+                            cards:
+                              - type: custom:mushroom-title-card
+                                title: Soggiorno
+                          - type: custom:slider-button-card
+                            entity: light.luce_sala
+                            slider:
+                              direction: left-right
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                          - type: custom:slider-button-card
+                            entity: light.led_divano_d
+                            slider:
+                              direction: left-right
+                              background: gradient
+                              use_state_color: false
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                          - type: custom:slider-button-card
+                            entity: light.led_divano_c
+                            slider:
+                              direction: left-right
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                          - type: custom:slider-button-card
+                            entity: light.led_divano_s
+                            slider:
+                              direction: left-right
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                  - type: vertical-stack
+                    cards:
+                      - type: vertical-stack
+                        cards:
+                          - type: horizontal-stack
+                            cards:
+                              - type: custom:mushroom-title-card
+                                title: Camera
+                          - type: custom:slider-button-card
+                            entity: light.luce_camera
+                            slider:
+                              direction: bottom-top
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: false
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: false
+                              tap_action:
+                                action: toggle
+                        grid_options:
+                          columns: 12
+                          rows: 2
+                      - type: vertical-stack
+                        cards:
+                          - type: horizontal-stack
+                            cards:
+                              - type: custom:mushroom-title-card
+                                title: Bagno
+                          - type: custom:slider-button-card
+                            entity: light.luce_bagno
+                            slider:
+                              direction: bottom-top
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: false
+                              tap_action:
+                                action: toggle
+                        grid_options:
+                          columns: 12
+                          rows: 2
+                      - type: vertical-stack
+                        cards:
+                          - type: horizontal-stack
+                            cards:
+                              - type: custom:mushroom-title-card
+                                title: Lavanderia
+                          - type: custom:slider-button-card
+                            entity: light.luce_lavanderia
+                            slider:
+                              direction: bottom-top
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: false
+                              tap_action:
+                                action: toggle
+                        grid_options:
+                          columns: 12
+                          rows: 2
+                columns: 3
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#sensore'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 3
+                rows: 4
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+              - square: true
+                type: grid
+                cards:
+                  - type: custom:button-card
+                    aspect_ratio: 4/1.5
+                    show_name: false
+                    show_icon: false
+                    show_state: true
+                    layout: icon_state_name2nd
+                    styles:
+                      card:
+                        - padding: 4%
+                        - background-image: >-
+                            [[[if
+                            (states["input_boolean.cantina_vini_animata"].state
+                            == "on") return 'url("/local/gif/rilevamento
+                            fumo.png")'; else return
+                            'url("/local/gif/rilevamento fumo.png")'; ]]]
+                        - background-size: 40%
+                        - background-repeat: no-repeat
+                        - background-position: center
+                      name:
+                        - font-weight: bold
+                        - font-size: 30px
+                        - align-self: middle
+                        - justify-self: start
+                        - padding-left: 10px
+                        - padding-top: 10px
+                        - padding-bottom: 10px
+                        - letter-spacing: '-1.0px'
+                      grid:
+                        - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                        - grid-template-columns: 30% 30% 30%
+                        - grid-template-rows: 1fr 1fr
+                        - column-gap: 20px
+                      custom_fields:
+                        logo:
+                          - position: absolute
+                          - left: 10%
+                          - top: 33%
+                    custom_fields:
+                      'n':
+                        card:
+                          type: custom:button-card
+                          entity: select.rilevatore_fumo_buzzer
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i3:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.rilevatore_fumo_smoke_density
+                          show_name: false
+                          show_state: true
+                          show_icon: false
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i5:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.rilevatore_fumo_battery
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                  - type: custom:button-card
+                    aspect_ratio: 4/1.5
+                    show_name: false
+                    show_icon: false
+                    show_state: true
+                    layout: icon_state_name2nd
+                    styles:
+                      card:
+                        - padding: 4%
+                        - background-image: >-
+                            [[[if
+                            (states["input_boolean.cantina_vini_animata"].state
+                            == "on") return 'url("/local/gif/rilevamento
+                            allagamento.png")'; else return
+                            'url("/local/gif/rilevamento allagamento.png")'; ]]]
+                        - background-size: 35%
+                        - background-repeat: no-repeat
+                        - background-position: center
+                      name:
+                        - font-weight: bold
+                        - font-size: 30px
+                        - align-self: middle
+                        - justify-self: start
+                        - padding-left: 10px
+                        - padding-top: 10px
+                        - padding-bottom: 10px
+                        - letter-spacing: '-1.0px'
+                      grid:
+                        - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                        - grid-template-columns: 30% 30% 30%
+                        - grid-template-rows: 1fr 1fr
+                        - column-gap: 20px
+                      custom_fields:
+                        logo:
+                          - position: absolute
+                          - left: 10%
+                          - top: 33%
+                    custom_fields:
+                      i3:
+                        card:
+                          type: custom:button-card
+                          entity: binary_sensor.rilevatore_acqua_lavandino
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i5:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.rilevatore_acqua_lavandino_battery
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                columns: 2
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#automazione'
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+              - type: custom:scheduler-card
+                include:
+                  - binary_sensor.porta_ingresso_contact
+                  - climate
+                  - cover
+                  - light.luce_ingresso
+                exclude:
+                  - climate.fan_shim
+                  - cover.tapparella_camera_l1
+                  - cover.tapparella_camera_l2
+                title: false
+                discover_existing: false
+                time_step: 10
+                sort_by:
+                  - relative-time
+                  - state
+                display_options:
+                  primary_info: default
+                  secondary_info: []
+                  icon: action
+                grid_options:
+                  columns: full
+        column_span: 1
+      - type: grid
+        cards:
+          - clock_size: medium
+            show_seconds: true
+            type: clock
+            grid_options:
+              columns: 12
+              rows: 1
+          - camera_view: live
+            fit_mode: cover
+            type: picture-glance
+            image: https://demo.home-assistant.io/stub_config/kitchen.png
+            entities:
+              - entity: input_button.ptz_sala_su
+                tap_action:
+                  action: toggle
+              - entity: input_button.ptz_sala_sinistra
+                tap_action:
+                  action: toggle
+              - entity: input_button.ptz_sala_destra
+                tap_action:
+                  action: toggle
+              - entity: input_button.ptz_sala_giu
+                tap_action:
+                  action: toggle
+              - entity: button.sala_guardia_vai_a
+                tap_action:
+                  action: toggle
+              - entity: input_boolean.media_sala
+                tap_action:
+                  action: navigate
+                  navigation_path: >-
+                    https://nk7liyg59dendp16ma2b1p76tnko6qvc.ui.nabu.casa/media-browser/browser/app%2Cmedia-source%3A%2F%2Freolink/playlist%2Cmedia-source%3A%2F%2Freolink%2FCAM%7C01JVQDNQY6ECSE5WCTV6B9B6Z6%7C0/playlist%2Cmedia-source%3A%2F%2Freolink%2FRES%7C01JVQDNQY6ECSE5WCTV6B9B6Z6%7C0%7Cmain
+                    camera.sala_scorrevole
+            camera_image: camera.sala_scorrevole
+            hold_action:
+              action: more-info
+          - type: picture-elements
+            elements:
+              - type: image
+                title: casa
+                image: /local/gif/casa.png
+                style:
+                  left: 50.5%
+                  top: 50%
+                  width: 25%
+              - type: image
+                title: energia
+                style:
+                  left: 50%
+                  top: 12%
+                  width: 15%
+                image: /local/gif//energia.png
+              - type: state-label
+                entity: sensor.somma_em06_power
+                style:
+                  left: 50%
+                  top: 35%
+                  font-size: 20px
+              - type: image
+                image: /api/image/serve/1459161a00890bf2c6fd14614623d982/512x512
+                title: freccia
+                style:
+                  left: 50%
+                  top: 25%
+                  width: 5%
+              - type: image
+                image: /api/image/serve/1459161a00890bf2c6fd14614623d982/512x512
+                title: freccia
+                style:
+                  left: 30%
+                  top: 60%
+                  width: 5%
+                  transform: rotate(50deg)
+              - type: image
+                image: /api/image/serve/1459161a00890bf2c6fd14614623d982/512x512
+                title: freccia
+                style:
+                  left: 50%
+                  top: 65%
+                  width: 5%
+              - type: image
+                image: /api/image/serve/1459161a00890bf2c6fd14614623d982/512x512
+                title: freccia
+                style:
+                  left: 67%
+                  top: 60%
+                  width: 5%
+                  transform: rotate(310deg)
+              - type: state-label
+                entity: sensor.somma_em06_consumi
+                style:
+                  left: 80%
+                  top: 20%
+                  font-size: 20px
+                  background-color: rgba(153, 153, 153, 0.8)
+                  color: white
+            image: /local/gif/sfondo2.png
+            grid_options:
+              columns: 12
+              rows: 6
+          - type: vertical-stack
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: pop-up
+                    hash: '#j.a.r.v.i.s'
+                    width_desktop: 1000px
+                    show_header: false
+                  - square: true
+                    type: grid
+                    cards:
+                      - type: vertical-stack
+                        cards:
+                          - type: custom:mushroom-update-card
+                            entity: update.home_assistant_supervisor_update
+                            fill_container: true
+                            layout: horizontal
+                          - type: custom:mushroom-update-card
+                            entity: update.home_assistant_core_update
+                            fill_container: true
+                            layout: horizontal
+                          - type: custom:mushroom-update-card
+                            entity: update.home_assistant_operating_system_update
+                            fill_container: true
+                            layout: horizontal
+                          - type: tile
+                            vertical: false
+                            state_content: state
+                            grid_options:
+                              columns: 12
+                              rows: 1
+                            entity: sensor.uptime
+                            name: 'Tempo di accensione:'
+                            features_position: bottom
+                          - type: vertical-stack
+                            cards:
+                              - type: entity
+                                entity: binary_sensor.remote_ui
+                              - type: entity
+                                entity: binary_sensor.rpi_power_status
+                      - square: true
+                        type: grid
+                        cards:
+                          - graph: line
+                            type: sensor
+                            detail: 1
+                            entity: sensor.speedtest_scarica
+                            name: 'Download '
+                          - graph: line
+                            type: sensor
+                            detail: 1
+                            entity: sensor.speedtest_carica
+                            name: Upload
+                          - graph: line
+                            type: sensor
+                            detail: 1
+                            entity: sensor.speedtest_ping
+                            name: Ping
+                        columns: 2
+                      - square: true
+                        type: grid
+                        cards:
+                          - graph: line
+                            type: sensor
+                            detail: 1
+                            entity: sensor.disk_use_percent
+                            name: Hard disk
+                          - graph: line
+                            type: sensor
+                            detail: 1
+                            entity: sensor.processor_temperature
+                            name: Processore
+                          - graph: line
+                            type: sensor
+                            detail: 1
+                            entity: sensor.processor_use
+                            name: 'Processore '
+                        columns: 2
+                    columns: 3
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#musica'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 4
+                rows: 4
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+              - square: true
+                type: grid
+                cards:
+                  - type: custom:mini-media-player
+                    artwork: full-cover
+                    entity: media_player.spotify
+                    toggle_power: false
+                    volume_stateless: false
+                    group: false
+                    source: icon
+                    sound_mode: icon
+                    info: short
+                  - type: vertical-stack
+                    cards:
+                      - type: horizontal-stack
+                        cards:
+                          - show_name: true
+                            show_icon: false
+                            type: button
+                            tap_action:
+                              action: toggle
+                            entity: script.playlist_pinguini_tattici_nucleari
+                            name: Pinguini Tattici     Nucleari
+                          - show_name: true
+                            show_icon: false
+                            type: button
+                            tap_action:
+                              action: toggle
+                            entity: script.playlist_vasco_rossi
+                            name: Vasco Rossi
+                          - show_name: true
+                            show_icon: false
+                            type: button
+                            tap_action:
+                              action: toggle
+                            entity: script.playlist_olly
+                            name: Olly
+                          - show_name: true
+                            show_icon: false
+                            type: button
+                            tap_action:
+                              action: toggle
+                            entity: script.playlist_mr_rain
+                            name: Mr. Rain
+                        grid_options:
+                          columns: 12
+                          rows: 2
+                      - type: horizontal-stack
+                        cards:
+                          - show_name: true
+                            show_icon: false
+                            type: button
+                            tap_action:
+                              action: toggle
+                            entity: script.playlist_max_pezzali
+                            name: Max Pezzali
+                        grid_options:
+                          columns: 12
+                          rows: 2
+                columns: 2
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#sala_termostato'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 1
+                rows: 1
+                margin: 7px
+                width_desktop: 1000px
+                margin_top_mobile: 1px
+                show_header: false
+              - type: thermostat
+                entity: climate.termostato_sala
+                features:
+                  - style: dropdown
+                    type: climate-hvac-modes
+                    hvac_modes:
+                      - 'off'
+                      - heat
+                show_current_as_primary: false
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Sala
+                2_name: Camera
+                1_icon: mdi:thermostat
+                1_link: '#sala_termostato'
+                2_link: '#camera_termostato'
+                2_icon: mdi:thermostat
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera_termostato'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 1
+                rows: 1
+                margin: 7px
+                width_desktop: 1000px
+                margin_top_mobile: 1px
+                show_header: false
+              - type: thermostat
+                entity: climate.termostato_camera
+                features:
+                  - style: dropdown
+                    type: climate-hvac-modes
+                    hvac_modes:
+                      - 'off'
+                      - heat
+                show_current_as_primary: false
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Sala
+                2_name: Camera
+                1_icon: mdi:thermostat
+                1_link: '#sala_termostato'
+                2_link: '#camera_termostato'
+                2_icon: mdi:thermostat
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#sala_tapparella'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 1
+                rows: 1
+                margin: 7px
+                width_desktop: 1000px
+                margin_top_mobile: 1px
+                show_header: false
+              - type: custom:shutter-card
+                title: Sala
+                entities:
+                  - entity: cover.tapparella_sala
+                    name: Posizione
+                    buttons_position: left
+                    title_position: bottom
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Sala
+                2_name: Camera
+                1_icon: mdi:blinds-horizontal
+                1_link: '#sala_tapparella'
+                2_link: '#camera_tapparella'
+                2_icon: mdi:blinds-horizontal
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera_tapparella'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 1
+                rows: 1
+                margin: 7px
+                width_desktop: 1000px
+                margin_top_mobile: 1px
+                show_header: false
+              - type: custom:shutter-card
+                title: Camera
+                entities:
+                  - entity: cover.tapparella_camera
+                    name: Posizione
+                    buttons_position: left
+                    title_position: bottom
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Sala
+                2_name: Camera
+                1_icon: mdi:blinds-horizontal
+                1_link: '#sala_tapparella'
+                2_link: '#camera_tapparella'
+                2_icon: mdi:blinds-horizontal
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#energia_annuale'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 4
+                rows: 4
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+              - type: vertical-stack
+                cards:
+                  - type: custom:power-flow-card-plus
+                    entities:
+                      battery:
+                        entity: ''
+                        state_of_charge: sensor.mi_9t_pro_battery_level
+                      individual:
+                        - entity: sensor.presa_smart_asciugatrice_power
+                          secondary_info:
+                            unit_white_space: true
+                          name: Asciugatrice
+                          decimals: 2
+                          display_zero: true
+                          color_value: false
+                          color_icon: true
+                          display_zero_state: true
+                          inverted_animation: false
+                          show_direction: true
+                          unit_white_space: false
+                          use_metadata: false
+                        - entity: sensor.presa_smart_lavatrice_power
+                          secondary_info:
+                            accept_negative: false
+                            color_value: false
+                            display_zero: false
+                          display_zero: true
+                          name: Lavatrice
+                          decimals: 2
+                          use_metadata: false
+                          show_direction: true
+                          inverted_animation: false
+                          unit_white_space: false
+                          color_value: false
+                          display_zero_state: true
+                      grid:
+                        secondary_info: {}
+                        entity: sensor.somma_em06_power
+                        display_state: one_way
+                        display_zero_tolerance: 0
+                        invert_state: false
+                        use_metadata: false
+                      home:
+                        secondary_info: {}
+                        override_state: false
+                      fossil_fuel_percentage:
+                        secondary_info: {}
+                        entity: sensor.electricity_maps_intensita_della_co2
+                        display_zero: true
+                    clickable_entities: true
+                    display_zero_lines:
+                      mode: show
+                      transparency: 50
+                      grey_color:
+                        - 189
+                        - 189
+                        - 189
+                    use_new_flow_rate_model: true
+                    w_decimals: 2
+                    kw_decimals: 1
+                    min_flow_rate: 0.75
+                    max_flow_rate: 6
+                    max_expected_power: 2000
+                    min_expected_power: 0.01
+                    watt_threshold: 1000
+                    transparency_zero_lines: 0
+                    sort_individual_devices: false
+                    disable_dots: false
+                    title: Consumo attuale
+                    dashboard_link: /energy
+              - type: horizontal-stack
+                cards:
+                  - type: custom:button-card
+                    aspect_ratio: 4/1.5
+                    name: Annuale
+                    show_name: true
+                    show_icon: false
+                    show_state: true
+                    layout: icon_state_name2nd
+                    styles:
+                      card:
+                        - padding: 4%
+                        - background-image: >-
+                            [[[if
+                            (states["input_boolean.lavatrice_animata"].state ==
+                            "on") return 'url("/local/gif/lavatrice on.png")';
+                            else return 'url("/local/gif/lavatrice off.png")';
+                            ]]]
+                        - background-size: 25%
+                        - background-repeat: no-repeat
+                        - background-position: center
+                      name:
+                        - font-weight: bold
+                        - font-size: 25px
+                        - align-self: flex-start
+                        - justify-self: start
+                        - padding-left: 10px
+                        - padding-top: 0px
+                        - padding-bottom: 10px
+                        - letter-spacing: '-1.0px'
+                      grid:
+                        - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                        - grid-template-columns: 30% 30% 30%
+                        - grid-template-rows: 10fr 1fr
+                        - column-gap: 15px
+                      custom_fields:
+                        logo:
+                          - position: absolute
+                          - left: 10%
+                          - top: 33%
+                    custom_fields:
+                      'n':
+                        card:
+                          type: custom:button-card
+                          entity: switch.presa_smart_lavatrice
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i2:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.costo_lavatrice_annuale
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i3:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.lavatrice_annuale
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i5:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.presa_smart_lavatrice_power
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                  - type: custom:button-card
+                    aspect_ratio: 4/1.5
+                    name: Annuale
+                    show_name: false
+                    show_icon: false
+                    show_state: true
+                    layout: icon_state_name2nd
+                    styles:
+                      card:
+                        - padding: 4%
+                        - background-image: >-
+                            [[[if
+                            (states["input_boolean.asciugatrice_animata"].state
+                            == "on") return 'url("/local/gif/asciugatrice
+                            on.png")'; else return 'url("/local/gif/asciugatrice
+                            off.png")'; ]]]
+                        - background-size: 25%
+                        - background-repeat: no-repeat
+                        - background-position: center
+                      name:
+                        - font-weight: bold
+                        - font-size: 25px
+                        - align-self: flex-start
+                        - justify-self: start
+                        - padding-left: 10px
+                        - padding-top: 10px
+                        - padding-bottom: 10px
+                        - letter-spacing: '-1.0px'
+                      grid:
+                        - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                        - grid-template-columns: 30% 30% 30%
+                        - grid-template-rows: 1fr 1fr
+                        - column-gap: 15px
+                      custom_fields:
+                        logo:
+                          - position: absolute
+                          - left: 10%
+                          - top: 33%
+                    custom_fields:
+                      'n':
+                        card:
+                          type: custom:button-card
+                          entity: switch.presa_smart_asciugatrice
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i2:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.costo_asciugatrice_annuale
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i3:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.asciugatrice_annuale
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i5:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.presa_smart_asciugatrice_power
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Annuale
+                2_name: Mensile
+                1_icon: mdi:lightning-bolt
+                1_link: '#energia_annuale'
+                2_link: '#energia_mensile'
+                2_icon: mdi:lightning-bolt
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#energia_mensile'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 4
+                rows: 4
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+              - type: vertical-stack
+                cards:
+                  - type: custom:power-flow-card-plus
+                    entities:
+                      battery:
+                        entity: ''
+                        state_of_charge: sensor.mi_9t_pro_battery_level
+                      individual:
+                        - entity: sensor.presa_smart_asciugatrice_power
+                          secondary_info:
+                            unit_white_space: true
+                          name: Asciugatrice
+                          decimals: 2
+                          display_zero: true
+                          color_value: false
+                          color_icon: true
+                          display_zero_state: true
+                          inverted_animation: false
+                          show_direction: true
+                          unit_white_space: false
+                          use_metadata: false
+                        - entity: sensor.presa_smart_lavatrice_power
+                          secondary_info:
+                            accept_negative: false
+                            color_value: false
+                            display_zero: false
+                          display_zero: true
+                          name: Lavatrice
+                          decimals: 2
+                          use_metadata: false
+                          show_direction: true
+                          inverted_animation: false
+                          unit_white_space: false
+                          color_value: false
+                          display_zero_state: true
+                      grid:
+                        secondary_info: {}
+                        entity: sensor.somma_em06_power
+                        display_state: one_way
+                        display_zero_tolerance: 0
+                        invert_state: false
+                        use_metadata: false
+                      home:
+                        secondary_info: {}
+                        override_state: false
+                      fossil_fuel_percentage:
+                        secondary_info: {}
+                        entity: sensor.electricity_maps_intensita_della_co2
+                        display_zero: true
+                    clickable_entities: true
+                    display_zero_lines:
+                      mode: show
+                      transparency: 50
+                      grey_color:
+                        - 189
+                        - 189
+                        - 189
+                    use_new_flow_rate_model: true
+                    w_decimals: 2
+                    kw_decimals: 1
+                    min_flow_rate: 0.75
+                    max_flow_rate: 6
+                    max_expected_power: 2000
+                    min_expected_power: 0.01
+                    watt_threshold: 1000
+                    transparency_zero_lines: 0
+                    sort_individual_devices: false
+                    disable_dots: false
+                    title: Consumo attuale
+                    dashboard_link: /energy
+              - type: horizontal-stack
+                cards:
+                  - type: custom:button-card
+                    aspect_ratio: 4/1.5
+                    name: Mensile
+                    show_name: true
+                    show_icon: false
+                    show_state: true
+                    layout: icon_state_name2nd
+                    styles:
+                      card:
+                        - padding: 4%
+                        - background-image: >-
+                            [[[if
+                            (states["input_boolean.lavatrice_animata"].state ==
+                            "on") return 'url("/local/gif/lavatrice on.png")';
+                            else return 'url("/local/gif/lavatrice off.png")';
+                            ]]]
+                        - background-size: 25%
+                        - background-repeat: no-repeat
+                        - background-position: center
+                      name:
+                        - font-weight: bold
+                        - font-size: 25px
+                        - align-self: flex-start
+                        - justify-self: start
+                        - padding-left: 10px
+                        - padding-top: 0px
+                        - padding-bottom: 10px
+                        - letter-spacing: '-1.0px'
+                      grid:
+                        - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                        - grid-template-columns: 30% 30% 30%
+                        - grid-template-rows: 10fr 1fr
+                        - column-gap: 15px
+                      custom_fields:
+                        logo:
+                          - position: absolute
+                          - left: 10%
+                          - top: 33%
+                    custom_fields:
+                      'n':
+                        card:
+                          type: custom:button-card
+                          entity: switch.presa_smart_lavatrice
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i2:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.costo_lavatrice_mensile
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i3:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.lavatrice_mensile
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i5:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.presa_smart_lavatrice_power
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                  - type: custom:button-card
+                    aspect_ratio: 4/1.5
+                    name: Mensile
+                    show_name: false
+                    show_icon: false
+                    show_state: true
+                    layout: icon_state_name2nd
+                    styles:
+                      card:
+                        - padding: 4%
+                        - background-image: >-
+                            [[[if
+                            (states["input_boolean.asciugatrice_animata"].state
+                            == "on") return 'url("/local/gif/asciugatrice
+                            on.png")'; else return 'url("/local/gif/asciugatrice
+                            off.png")'; ]]]
+                        - background-size: 25%
+                        - background-repeat: no-repeat
+                        - background-position: center
+                      name:
+                        - font-weight: bold
+                        - font-size: 25px
+                        - align-self: flex-start
+                        - justify-self: start
+                        - padding-left: 10px
+                        - padding-top: 10px
+                        - padding-bottom: 10px
+                        - letter-spacing: '-1.0px'
+                      grid:
+                        - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                        - grid-template-columns: 30% 30% 30%
+                        - grid-template-rows: 1fr 1fr
+                        - column-gap: 15px
+                      custom_fields:
+                        logo:
+                          - position: absolute
+                          - left: 10%
+                          - top: 33%
+                    custom_fields:
+                      'n':
+                        card:
+                          type: custom:button-card
+                          entity: switch.presa_smart_asciugatrice
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i2:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.costo_asciugatrice_mensile
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i3:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.asciugatrice_mensile
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i5:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.presa_smart_asciugatrice_power
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Annuale
+                2_name: Mensile
+                1_icon: mdi:lightning-bolt
+                1_link: '#energia_annuale'
+                2_link: '#energia_mensile'
+                2_icon: mdi:lightning-bolt
+    icon: mdi:home-assistant
+    cards: []
+    max_columns: 3
+    dense_section_placement: false
+    header:
+      layout: start
+      badges_position: bottom
+    badges:
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: binary_sensor.porta_ingresso_contact
+        visibility:
+          - condition: state
+            entity: binary_sensor.porta_ingresso_contact
+            state: 'on'
+        name: Porta ingresso
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: binary_sensor.finestra_camera_contact
+        name: Finestra camera
+        show_entity_picture: false
+        visibility:
+          - condition: state
+            entity: binary_sensor.finestra_camera_contact
+            state: 'on'
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: binary_sensor.finestra_sala_contact
+        show_entity_picture: false
+        visibility:
+          - condition: state
+            entity: binary_sensor.finestra_sala_contact
+            state: 'on'
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: binary_sensor.movimento_sala
+        show_entity_picture: false
+        visibility:
+          - condition: state
+            entity: binary_sensor.movimento_sala
+            state: 'on'
+          - condition: and
+            conditions:
+              - condition: state
+                entity: alarm_control_panel.allarme
+                state_not: disarmed
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: sensor.finestra_sala_battery
+        show_entity_picture: false
+        visibility:
+          - condition: numeric_state
+            entity: binary_sensor.finestra_sala_contact
+            below: 20
+        name: Finestra sala
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: sensor.finestra_camera_battery
+        name: Finestra camera
+        show_entity_picture: false
+        visibility:
+          - condition: numeric_state
+            entity: sensor.finestra_camera_battery
+            below: 20
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: sensor.sensore_movimento_battery
+        name: Sensore movimento
+        show_entity_picture: false
+        visibility:
+          - condition: numeric_state
+            entity: sensor.finestra_camera_battery
+            below: 20
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: sensor.ingresso_batteria
+        visibility:
+          - condition: numeric_state
+            entity: sensor.ingresso_batteria
+            below: 20
+        tap_action:
+          action: none
+        name: Batteria ingresso
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        visibility:
+          - condition: state
+            entity: binary_sensor.smart_lock_door_battery_critical
+            state: 'on'
+        entity: sensor.smart_lock_door_battery
+        tap_action:
+          action: none
+        name: Batteria porta
+  - icon: mdi:blinds-horizontal
+    title: Tapparelle
+    path: tapparelle
+    cards: []
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: 1
+          - type: custom:shutter-card
+            title: Tapparella sala
+            entities:
+              - entity: cover.tapparella_sala
+                name: Posizione
+                buttons_position: left
+                title_position: bottom
+        column_span: 1
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 9
+              rows: auto
+          - show_name: false
+            show_icon: true
+            type: button
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-tablet/0
+            icon: mdi:home
+          - type: custom:shutter-card
+            title: Tapparella camera
+            entities:
+              - entity: cover.tapparella_camera
+                name: Posizione
+                buttons_position: left
+                title_position: bottom
+        column_span: 1
+      - type: grid
+        cards:
+          - type: custom:mushroom-cover-card
+            entity: cover.tapparella_camera
+            fill_container: false
+            show_position_control: false
+            show_tilt_position_control: false
+            show_buttons_control: true
+            primary_info: name
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+    max_columns: 4
+    dense_section_placement: false
+    subview: true
+    badges: []
+  - icon: mdi:leak
+    title: Sensori
+    path: sensori
+    cards: []
+    type: sections
+    sections:
+      - xtype: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: 1
+          - type: custom:button-card
+            aspect_ratio: 4/1.5
+            show_name: false
+            show_icon: false
+            show_state: true
+            layout: icon_state_name2nd
+            styles:
+              card:
+                - padding: 4%
+                - background-image: >-
+                    [[[if (states["input_boolean.cantina_vini_animata"].state ==
+                    "on") return 'url("/local/gif/rilevamento fumo.png")'; else
+                    return 'url("/local/gif/rilevamento fumo.png")'; ]]]
+                - background-size: 40%
+                - background-repeat: no-repeat
+                - background-position: center
+              name:
+                - font-weight: bold
+                - font-size: 30px
+                - align-self: middle
+                - justify-self: start
+                - padding-left: 10px
+                - padding-top: 10px
+                - padding-bottom: 10px
+                - letter-spacing: '-1.0px'
+              grid:
+                - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                - grid-template-columns: 30% 30% 30%
+                - grid-template-rows: 1fr 1fr
+                - column-gap: 20px
+              custom_fields:
+                logo:
+                  - position: absolute
+                  - left: 10%
+                  - top: 33%
+            custom_fields:
+              'n':
+                card:
+                  type: custom:button-card
+                  entity: select.rilevatore_fumo_buzzer
+                  show_name: false
+                  show_state: true
+                  show_icon: null
+                  aspect_ratio: 4/1
+                  tap_action:
+                    action: more-info
+                    service: null
+                    data: {}
+                    target:
+                      entity_id:
+                        - null
+                  state:
+                    - value: 'on'
+                      icon: mdi:lightbulb-on-10
+                    - value: 'off'
+                      icon: mdi:lightbulb-outline
+                  styles:
+                    card:
+                      - background-color: '#e5e5ea'
+                      - border-radius: 35px
+                      - border-style: none
+                      - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                    icon:
+                      - width: 30px
+                      - height: 30px
+                      - color: '#e5e5ea'
+                      - align-self: start
+                      - text-align: start
+                      - padding: 5px
+                    img_cell:
+                      - justify-content: middle
+                      - align-self: middle
+                      - margin: none
+              i3:
+                card:
+                  type: custom:button-card
+                  entity: sensor.rilevatore_fumo_smoke_density
+                  show_name: false
+                  show_state: true
+                  show_icon: false
+                  aspect_ratio: 4/1
+                  tap_action:
+                    action: more-info
+                    service: null
+                    data: {}
+                    target:
+                      entity_id:
+                        - null
+                  state:
+                    - value: 'on'
+                      icon: mdi:lightbulb-on-10
+                    - value: 'off'
+                      icon: mdi:lightbulb-outline
+                  styles:
+                    card:
+                      - background-color: '#e5e5ea'
+                      - border-radius: 35px
+                      - border-style: none
+                      - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                    icon:
+                      - width: 30px
+                      - height: 30px
+                      - color: '#e5e5ea'
+                      - align-self: start
+                      - text-align: start
+                      - padding: 5px
+                    img_cell:
+                      - justify-content: middle
+                      - align-self: middle
+                      - margin: none
+              i5:
+                card:
+                  type: custom:button-card
+                  entity: sensor.rilevatore_fumo_battery
+                  show_name: false
+                  show_state: true
+                  show_icon: null
+                  aspect_ratio: 4/1
+                  tap_action:
+                    action: more-info
+                    service: null
+                    data: {}
+                    target:
+                      entity_id:
+                        - null
+                  state:
+                    - value: 'on'
+                      icon: mdi:lightbulb-on-10
+                    - value: 'off'
+                      icon: mdi:lightbulb-outline
+                  styles:
+                    card:
+                      - background-color: '#e5e5ea'
+                      - border-radius: 35px
+                      - border-style: none
+                      - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                    icon:
+                      - width: 30px
+                      - height: 30px
+                      - color: '#e5e5ea'
+                      - align-self: start
+                      - text-align: start
+                      - padding: 5px
+                    img_cell:
+                      - justify-content: middle
+                      - align-self: middle
+                      - margin: none
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 9
+              rows: auto
+          - show_name: false
+            show_icon: true
+            type: button
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-tablet/0
+            icon: mdi:home
+          - type: custom:button-card
+            aspect_ratio: 4/1.5
+            show_name: false
+            show_icon: false
+            show_state: true
+            layout: icon_state_name2nd
+            styles:
+              card:
+                - padding: 4%
+                - background-image: >-
+                    [[[if (states["input_boolean.cantina_vini_animata"].state ==
+                    "on") return 'url("/local/gif/rilevamento
+                    allagamento.png")'; else return 'url("/local/gif/rilevamento
+                    allagamento.png")'; ]]]
+                - background-size: 35%
+                - background-repeat: no-repeat
+                - background-position: center
+              name:
+                - font-weight: bold
+                - font-size: 30px
+                - align-self: middle
+                - justify-self: start
+                - padding-left: 10px
+                - padding-top: 10px
+                - padding-bottom: 10px
+                - letter-spacing: '-1.0px'
+              grid:
+                - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                - grid-template-columns: 30% 30% 30%
+                - grid-template-rows: 1fr 1fr
+                - column-gap: 20px
+              custom_fields:
+                logo:
+                  - position: absolute
+                  - left: 10%
+                  - top: 33%
+            custom_fields:
+              i3:
+                card:
+                  type: custom:button-card
+                  entity: binary_sensor.rilevatore_acqua_lavandino
+                  show_name: false
+                  show_state: true
+                  show_icon: null
+                  aspect_ratio: 4/1
+                  tap_action:
+                    action: more-info
+                    service: null
+                    data: {}
+                    target:
+                      entity_id:
+                        - null
+                  state:
+                    - value: 'on'
+                      icon: mdi:lightbulb-on-10
+                    - value: 'off'
+                      icon: mdi:lightbulb-outline
+                  styles:
+                    card:
+                      - background-color: '#e5e5ea'
+                      - border-radius: 35px
+                      - border-style: none
+                      - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                    icon:
+                      - width: 30px
+                      - height: 30px
+                      - color: '#e5e5ea'
+                      - align-self: start
+                      - text-align: start
+                      - padding: 5px
+                    img_cell:
+                      - justify-content: middle
+                      - align-self: middle
+                      - margin: none
+              i5:
+                card:
+                  type: custom:button-card
+                  entity: sensor.rilevatore_acqua_lavandino_battery
+                  show_name: false
+                  show_state: true
+                  show_icon: null
+                  aspect_ratio: 4/1
+                  tap_action:
+                    action: more-info
+                    service: null
+                    data: {}
+                    target:
+                      entity_id:
+                        - null
+                  state:
+                    - value: 'on'
+                      icon: mdi:lightbulb-on-10
+                    - value: 'off'
+                      icon: mdi:lightbulb-outline
+                  styles:
+                    card:
+                      - background-color: '#e5e5ea'
+                      - border-radius: 35px
+                      - border-style: none
+                      - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                    icon:
+                      - width: 30px
+                      - height: 30px
+                      - color: '#e5e5ea'
+                      - align-self: start
+                      - text-align: start
+                      - padding: 5px
+                    img_cell:
+                      - justify-content: middle
+                      - align-self: middle
+                      - margin: none
+    max_columns: 4
+    subview: true
+  - icon: mdi:home-thermometer-outline
+    title: Termostati
+    path: termostati
+    cards: []
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: 1
+          - type: thermostat
+            entity: climate.termostato_sala
+            features:
+              - type: climate-hvac-modes
+                hvac_modes:
+                  - 'off'
+                  - heat
+          - type: custom:button-card
+            aspect_ratio: 4/1.5
+            show_name: false
+            show_icon: false
+            show_state: true
+            layout: icon_state_name2nd
+            styles:
+              card:
+                - padding: 4%
+                - background-image: >-
+                    [[[if (states["input_boolean.cantina_vini_animata"].state ==
+                    "on") return 'url("/local/gif/climatizzatore.png")'; else
+                    return 'url("/local/gif/climatizzatore.png")'; ]]]
+                - background-size: 55%
+                - background-repeat: no-repeat
+                - background-position: center
+              name:
+                - font-weight: bold
+                - font-size: 30px
+                - align-self: middle
+                - justify-self: start
+                - padding-left: 10px
+                - padding-top: 10px
+                - padding-bottom: 10px
+                - letter-spacing: '-1.0px'
+              grid:
+                - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                - grid-template-columns: 30% 30% 30%
+                - grid-template-rows: 1fr 1fr
+                - column-gap: 20px
+              custom_fields:
+                logo:
+                  - position: absolute
+                  - left: 10%
+                  - top: 33%
+            custom_fields:
+              'n':
+                card:
+                  type: custom:button-card
+                  entity: select.rilevatore_fumo_buzzer
+                  show_name: false
+                  show_state: true
+                  show_icon: null
+                  aspect_ratio: 4/1
+                  tap_action:
+                    action: more-info
+                    service: null
+                    data: {}
+                    target:
+                      entity_id:
+                        - null
+                  state:
+                    - value: 'on'
+                      icon: mdi:lightbulb-on-10
+                    - value: 'off'
+                      icon: mdi:lightbulb-outline
+                  styles:
+                    card:
+                      - background-color: '#e5e5ea'
+                      - border-radius: 35px
+                      - border-style: none
+                      - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                    icon:
+                      - width: 30px
+                      - height: 30px
+                      - color: '#e5e5ea'
+                      - align-self: start
+                      - text-align: start
+                      - padding: 5px
+                    img_cell:
+                      - justify-content: middle
+                      - align-self: middle
+                      - margin: none
+              i3:
+                card:
+                  type: custom:button-card
+                  entity: sensor.rilevatore_fumo_smoke_density
+                  show_name: false
+                  show_state: true
+                  show_icon: false
+                  aspect_ratio: 4/1
+                  tap_action:
+                    action: more-info
+                    service: null
+                    data: {}
+                    target:
+                      entity_id:
+                        - null
+                  state:
+                    - value: 'on'
+                      icon: mdi:lightbulb-on-10
+                    - value: 'off'
+                      icon: mdi:lightbulb-outline
+                  styles:
+                    card:
+                      - background-color: '#e5e5ea'
+                      - border-radius: 35px
+                      - border-style: none
+                      - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                    icon:
+                      - width: 30px
+                      - height: 30px
+                      - color: '#e5e5ea'
+                      - align-self: start
+                      - text-align: start
+                      - padding: 5px
+                    img_cell:
+                      - justify-content: middle
+                      - align-self: middle
+                      - margin: none
+              i5:
+                card:
+                  type: custom:button-card
+                  entity: sensor.rilevatore_fumo_battery
+                  show_name: false
+                  show_state: true
+                  show_icon: null
+                  aspect_ratio: 4/1
+                  tap_action:
+                    action: more-info
+                    service: null
+                    data: {}
+                    target:
+                      entity_id:
+                        - null
+                  state:
+                    - value: 'on'
+                      icon: mdi:lightbulb-on-10
+                    - value: 'off'
+                      icon: mdi:lightbulb-outline
+                  styles:
+                    card:
+                      - background-color: '#e5e5ea'
+                      - border-radius: 35px
+                      - border-style: none
+                      - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                    icon:
+                      - width: 30px
+                      - height: 30px
+                      - color: '#e5e5ea'
+                      - align-self: start
+                      - text-align: start
+                      - padding: 5px
+                    img_cell:
+                      - justify-content: middle
+                      - align-self: middle
+                      - margin: none
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 9
+              rows: auto
+          - show_name: false
+            show_icon: true
+            type: button
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-tablet/0
+            icon: mdi:home
+          - type: thermostat
+            entity: climate.termostato_camera
+            features:
+              - type: climate-hvac-modes
+                hvac_modes:
+                  - 'off'
+                  - heat
+    max_columns: 2
+    subview: true
+    dense_section_placement: true
+  - icon: mdi:raspberry-pi
+    title: J.A.R.V.I.S.
+    path: j-a-r-v-i-s
+    cards: []
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: 2
+          - type: custom:mushroom-update-card
+            entity: update.home_assistant_supervisor_update
+            fill_container: true
+            layout: horizontal
+          - type: custom:mushroom-update-card
+            entity: update.home_assistant_core_update
+            fill_container: true
+            layout: horizontal
+          - type: custom:mushroom-update-card
+            entity: update.home_assistant_operating_system_update
+            fill_container: true
+            layout: horizontal
+          - type: tile
+            vertical: false
+            state_content: state
+            grid_options:
+              columns: 12
+              rows: 1
+            entity: sensor.uptime
+            name: 'Tempo di accensione:'
+            features_position: bottom
+          - type: entity
+            entity: binary_sensor.remote_ui
+          - type: entity
+            entity: binary_sensor.rpi_power_status
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: 1
+          - square: true
+            type: grid
+            cards:
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.speedtest_scarica
+                name: 'Download '
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.speedtest_carica
+                name: Upload
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.speedtest_ping
+                name: Ping
+            title: Speedtest
+            columns: 2
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 9
+              rows: auto
+          - show_name: false
+            show_icon: true
+            type: button
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-tablet/0
+            icon: mdi:home
+          - square: true
+            type: grid
+            cards:
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.disk_use_percent
+                name: Hard disk
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.processor_temperature
+                name: Processore
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.processor_use
+                name: 'Processore '
+            title: Raspberry
+            columns: 2
+    max_columns: 4
+    subview: true
+    badges: []
+    header:
+      layout: start
+      badges_position: top
+      card:
+        type: markdown
+        text_only: true
+        content: 'Vers.: 2025.1'
+  - type: sections
+    max_columns: 4
+    title: Musica
+    path: musica
+    icon: mdi:home-sound-out-outline
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: 1
+          - type: custom:mini-media-player
+            artwork: full-cover
+            entity: media_player.spotify
+            toggle_power: false
+            volume_stateless: false
+            group: false
+            source: icon
+            sound_mode: icon
+            info: short
+        column_span: 1
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 9
+              rows: auto
+          - show_name: false
+            show_icon: true
+            type: button
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-tablet/0
+            icon: mdi:home
+          - type: horizontal-stack
+            cards:
+              - show_name: true
+                show_icon: false
+                type: button
+                tap_action:
+                  action: toggle
+                entity: script.playlist_pinguini_tattici_nucleari
+                name: Pinguini Tattici     Nucleari
+              - show_name: true
+                show_icon: false
+                type: button
+                tap_action:
+                  action: toggle
+                entity: script.playlist_vasco_rossi
+                name: Vasco Rossi
+              - show_name: true
+                show_icon: false
+                type: button
+                tap_action:
+                  action: toggle
+                entity: script.playlist_olly
+                name: Olly
+              - show_name: true
+                show_icon: false
+                type: button
+                tap_action:
+                  action: toggle
+                entity: script.playlist_mr_rain
+                name: Mr. Rain
+            grid_options:
+              columns: 12
+              rows: 2
+          - type: horizontal-stack
+            cards:
+              - show_name: true
+                show_icon: false
+                type: button
+                tap_action:
+                  action: toggle
+                entity: script.playlist_max_pezzali
+                name: Max Pezzali
+            grid_options:
+              columns: 12
+              rows: 2
+    subview: true
+    cards: []
+  - type: sections
+    path: energia
+    subview: true
+    title: Energia
+    icon: mdi:transmission-tower
+    cards: []
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: 1
+          - type: custom:power-flow-card-plus
+            entities:
+              battery:
+                entity: ''
+                state_of_charge: sensor.mi_9t_pro_battery_level
+              individual:
+                - entity: sensor.presa_smart_asciugatrice_power
+                  secondary_info:
+                    unit_white_space: true
+                  name: Asciugatrice
+                  decimals: 2
+                  display_zero: true
+                  color_value: false
+                  color_icon: true
+                  display_zero_state: true
+                  inverted_animation: false
+                  show_direction: true
+                  unit_white_space: false
+                  use_metadata: false
+                - entity: sensor.presa_smart_lavatrice_power
+                  secondary_info:
+                    accept_negative: false
+                    color_value: false
+                    display_zero: false
+                  display_zero: true
+                  name: Lavatrice
+                  decimals: 2
+                  use_metadata: false
+                  show_direction: true
+                  inverted_animation: false
+                  unit_white_space: false
+                  color_value: false
+                  display_zero_state: true
+              grid:
+                secondary_info: {}
+                entity:
+                  consumption: sensor.presa_smart_asciugatrice_power
+              home:
+                secondary_info: {}
+                override_state: false
+              fossil_fuel_percentage:
+                secondary_info: {}
+                entity: sensor.electricity_maps_intensita_della_co2
+                display_zero: true
+            clickable_entities: true
+            display_zero_lines:
+              mode: show
+              transparency: 50
+              grey_color:
+                - 189
+                - 189
+                - 189
+            use_new_flow_rate_model: true
+            w_decimals: 0
+            kw_decimals: 1
+            min_flow_rate: 0.75
+            max_flow_rate: 6
+            max_expected_power: 2000
+            min_expected_power: 0.01
+            watt_threshold: 1000
+            transparency_zero_lines: 0
+            sort_individual_devices: false
+            disable_dots: false
+            title: Consumo attuale
+          - chart_type: bar
+            period: month
+            type: statistics-graph
+            entities:
+              - sensor.cantina_vini_annuale
+            hide_legend: true
+            logarithmic_scale: false
+            stat_types:
+              - state
+            days_to_show: 365
+            min_y_axis: 1
+            fit_y_data: true
+            grid_options:
+              rows: 5
+          - type: horizontal-stack
+            cards: []
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: title
+            grid_options:
+              columns: 6
+              rows: 1
+          - show_name: false
+            show_icon: true
+            type: button
+            tap_action:
+              action: navigate
+              navigation_path: /energy
+            icon: mdi:lightning-bolt
+          - show_name: false
+            show_icon: true
+            type: button
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-tablet/0
+            icon: mdi:home
+          - type: custom:swipe-card
+            parameters:
+              effect: coverflow
+              autoHeight: false
+              autoplay:
+                delay: 10000
+            cards:
+              - type: custom:button-card
+                aspect_ratio: 4/1.5
+                name: Annuale
+                show_name: true
+                show_icon: false
+                show_state: true
+                layout: icon_state_name2nd
+                styles:
+                  card:
+                    - padding: 4%
+                    - background-image: >-
+                        [[[if (states["input_boolean.lavatrice_animata"].state
+                        == "on") return 'url("/local/gif/lavatrice on.png")';
+                        else return 'url("/local/gif/lavatrice off.png")'; ]]]
+                    - background-size: 25%
+                    - background-repeat: no-repeat
+                    - background-position: center
+                  name:
+                    - font-weight: bold
+                    - font-size: 25px
+                    - align-self: flex-start
+                    - justify-self: start
+                    - padding-left: 10px
+                    - padding-top: 0px
+                    - padding-bottom: 10px
+                    - letter-spacing: '-1.0px'
+                  grid:
+                    - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                    - grid-template-columns: 30% 30% 30%
+                    - grid-template-rows: 10fr 1fr
+                    - column-gap: 15px
+                  custom_fields:
+                    logo:
+                      - position: absolute
+                      - left: 10%
+                      - top: 33%
+                custom_fields:
+                  'n':
+                    card:
+                      type: custom:button-card
+                      entity: switch.presa_smart_lavatrice
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+                  i2:
+                    card:
+                      type: custom:button-card
+                      entity: sensor.costo_lavatrice_annuale
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+                  i3:
+                    card:
+                      type: custom:button-card
+                      entity: sensor.lavatrice_annuale
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+                  i5:
+                    card:
+                      type: custom:button-card
+                      entity: sensor.presa_smart_lavatrice_power
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+              - type: custom:button-card
+                aspect_ratio: 4/1.5
+                name: Mensile
+                show_name: true
+                show_icon: false
+                show_state: true
+                layout: icon_state_name2nd
+                styles:
+                  card:
+                    - padding: 4%
+                    - background-image: >-
+                        [[[if (states["input_boolean.lavatrice_animata"].state
+                        == "on") return 'url("/local/gif/lavatrice on.png")';
+                        else return 'url("/local/gif/lavatrice off.png")'; ]]]
+                    - background-size: 25%
+                    - background-repeat: no-repeat
+                    - background-position: center
+                  name:
+                    - font-weight: bold
+                    - font-size: 25px
+                    - align-self: flex-start
+                    - justify-self: start
+                    - padding-left: 10px
+                    - padding-top: 0px
+                    - padding-bottom: 10px
+                    - letter-spacing: '-1.0px'
+                  grid:
+                    - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                    - grid-template-columns: 30% 30% 30%
+                    - grid-template-rows: 10fr 1fr
+                    - column-gap: 15px
+                  custom_fields:
+                    logo:
+                      - position: absolute
+                      - left: 10%
+                      - top: 33%
+                custom_fields:
+                  'n':
+                    card:
+                      type: custom:button-card
+                      entity: switch.presa_smart_lavatrice
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+                  i2:
+                    card:
+                      type: custom:button-card
+                      entity: sensor.costo_lavatrice_mensile
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+                  i3:
+                    card:
+                      type: custom:button-card
+                      entity: sensor.lavatrice_mensile
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+                  i5:
+                    card:
+                      type: custom:button-card
+                      entity: sensor.presa_smart_lavatrice_power
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+          - type: entities
+            entities:
+              - entity: sensor.lavatrice_annuale
+              - entity: sensor.lavatrice_mensile
+              - entity: sensor.lavatrice_giornaliera
+              - entity: sensor.costo_lavatrice_annuale
+              - entity: sensor.costo_lavatrice_mensile
+              - entity: sensor.costo_lavatrice_giornaliera
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: title
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: custom:swipe-card
+            parameters:
+              effect: coverflow
+              autoHeight: false
+              autoplay:
+                delay: 10000
+            cards:
+              - type: custom:button-card
+                aspect_ratio: 4/1.5
+                name: Annuale
+                show_name: false
+                show_icon: false
+                show_state: true
+                layout: icon_state_name2nd
+                styles:
+                  card:
+                    - padding: 4%
+                    - background-image: >-
+                        [[[if
+                        (states["input_boolean.asciugatrice_animata"].state ==
+                        "on") return 'url("/local/gif/asciugatrice on.png")';
+                        else return 'url("/local/gif/asciugatrice off.png")';
+                        ]]]
+                    - background-size: 25%
+                    - background-repeat: no-repeat
+                    - background-position: center
+                  name:
+                    - font-weight: bold
+                    - font-size: 25px
+                    - align-self: flex-start
+                    - justify-self: start
+                    - padding-left: 10px
+                    - padding-top: 10px
+                    - padding-bottom: 10px
+                    - letter-spacing: '-1.0px'
+                  grid:
+                    - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                    - grid-template-columns: 30% 30% 30%
+                    - grid-template-rows: 1fr 1fr
+                    - column-gap: 15px
+                  custom_fields:
+                    logo:
+                      - position: absolute
+                      - left: 10%
+                      - top: 33%
+                custom_fields:
+                  'n':
+                    card:
+                      type: custom:button-card
+                      entity: switch.presa_smart_asciugatrice
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+                  i2:
+                    card:
+                      type: custom:button-card
+                      entity: sensor.costo_asciugatrice_annuale
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+                  i3:
+                    card:
+                      type: custom:button-card
+                      entity: sensor.asciugatrice_annuale
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+                  i5:
+                    card:
+                      type: custom:button-card
+                      entity: sensor.presa_smart_asciugatrice_power
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+              - type: custom:button-card
+                aspect_ratio: 4/1.5
+                name: Mensile
+                show_name: false
+                show_icon: false
+                show_state: true
+                layout: icon_state_name2nd
+                styles:
+                  card:
+                    - padding: 4%
+                    - background-image: >-
+                        [[[if
+                        (states["input_boolean.asciugatrice_animata"].state ==
+                        "on") return 'url("/local/gif/asciugatrice on.png")';
+                        else return 'url("/local/gif/asciugatrice off.png")';
+                        ]]]
+                    - background-size: 25%
+                    - background-repeat: no-repeat
+                    - background-position: center
+                  name:
+                    - font-weight: bold
+                    - font-size: 25px
+                    - align-self: flex-start
+                    - justify-self: start
+                    - padding-left: 10px
+                    - padding-top: 10px
+                    - padding-bottom: 10px
+                    - letter-spacing: '-1.0px'
+                  grid:
+                    - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                    - grid-template-columns: 30% 30% 30%
+                    - grid-template-rows: 1fr 1fr
+                    - column-gap: 15px
+                  custom_fields:
+                    logo:
+                      - position: absolute
+                      - left: 10%
+                      - top: 33%
+                custom_fields:
+                  'n':
+                    card:
+                      type: custom:button-card
+                      entity: switch.presa_smart_asciugatrice
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+                  i2:
+                    card:
+                      type: custom:button-card
+                      entity: sensor.costo_asciugatrice_mensile
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+                  i3:
+                    card:
+                      type: custom:button-card
+                      entity: sensor.asciugatrice_mensile
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+                  i5:
+                    card:
+                      type: custom:button-card
+                      entity: sensor.presa_smart_asciugatrice_power
+                      show_name: false
+                      show_state: true
+                      show_icon: null
+                      aspect_ratio: 4/1
+                      tap_action:
+                        action: more-info
+                        service: null
+                        data: {}
+                        target:
+                          entity_id:
+                            - null
+                      state:
+                        - value: 'on'
+                          icon: mdi:lightbulb-on-10
+                        - value: 'off'
+                          icon: mdi:lightbulb-outline
+                      styles:
+                        card:
+                          - background-color: '#e5e5ea'
+                          - border-radius: 35px
+                          - border-style: none
+                          - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                        icon:
+                          - width: 30px
+                          - height: 30px
+                          - color: '#e5e5ea'
+                          - align-self: start
+                          - text-align: start
+                          - padding: 5px
+                        img_cell:
+                          - justify-content: middle
+                          - align-self: middle
+                          - margin: none
+          - type: entities
+            entities:
+              - entity: sensor.asciugatrice_annuale
+              - entity: sensor.asciugatrice_mensile
+              - entity: sensor.asciugatrice_giornaliera
+              - entity: sensor.costo_asciugatrice_annuale
+              - entity: sensor.costo_asciugatrice_mensile
+              - entity: sensor.costo_asciugatrice_giornaliera
+    max_columns: 3
+    dense_section_placement: false
+    top_margin: false
+  - type: sections
+    max_columns: 4
+    title: automazioni
+    path: automazioni
+    icon: mdi:robot
+    subview: true
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 33
+              rows: 1
+          - show_name: false
+            show_icon: true
+            type: button
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-tablet/0
+            icon: mdi:home
+          - type: custom:scheduler-card
+            include:
+              - binary_sensor.porta_ingresso_contact
+              - climate
+              - cover
+              - light.luce_ingresso
+            exclude:
+              - climate.fan_shim
+              - cover.tapparella_camera_l1
+              - cover.tapparella_camera_l2
+            title: false
+            discover_existing: false
+            time_step: 10
+            sort_by:
+              - relative-time
+              - state
+            display_options:
+              primary_info: default
+              secondary_info: []
+              icon: action
+            grid_options:
+              columns: full
+        column_span: 4
+    cards: []
+  - type: sections
+    max_columns: 4
+    title: planimetria
+    path: planimetria
+    icon: mdi:floor-plan
+    subview: true
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 33
+              rows: 1
+          - show_name: false
+            show_icon: true
+            type: button
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-tablet/0
+            icon: mdi:home
+          - type: picture-elements
+            image: local/floorplan/casa_giorno.png
+            elements:
+              - type: image
+                entity: light.luce_ingresso
+                hold_action: none
+                state_image:
+                  'off': /local/floorplan/bottone.png
+                  'on': /local/floorplan/ingresso1.png
+                style:
+                  left: 50%
+                  top: 50%
+                  width: 100%
+                tap_action: none
+              - type: image
+                entity: light.luce_cucina
+                hold_action: none
+                state_image:
+                  'off': /local/floorplan/bottone.png
+                  'on': /local/floorplan/cucina1.png
+                style:
+                  left: 50%
+                  top: 50%
+                  width: 100%
+                tap_action: none
+              - type: image
+                entity: light.luce_bagno
+                hold_action: none
+                state_image:
+                  'off': /local/floorplan/bottone.png
+                  'on': /local/floorplan/bagno1.png
+                style:
+                  left: 50%
+                  top: 50%
+                  width: 100%
+                tap_action: none
+              - type: image
+                entity: light.luce_lavanderia
+                hold_action: none
+                state_image:
+                  'off': /local/floorplan/bottone.png
+                  'on': /local/floorplan/lavanderia1.png
+                style:
+                  left: 50%
+                  top: 50%
+                  width: 100%
+                tap_action: none
+              - type: image
+                entity: light.luce_camera
+                hold_action: none
+                state_image:
+                  'off': /local/floorplan/bottone.png
+                  'on': /local/floorplan/camera1.png
+                style:
+                  left: 50%
+                  top: 50%
+                  width: 100%
+                tap_action: none
+              - type: image
+                entity: light.luce_sala
+                hold_action: none
+                state_image:
+                  'off': /local/floorplan/bottone.png
+                  'on': /local/floorplan/sala1.png
+                style:
+                  left: 50%
+                  top: 50%
+                  width: 100%
+                tap_action: none
+              - type: image
+                entity: light.luce_balcone
+                hold_action: none
+                state_image:
+                  'off': /local/floorplan/bottone.png
+                  'on': /local/floorplan/balcone1.png
+                style:
+                  left: 50%
+                  top: 50%
+                  width: 100%
+                tap_action: none
+              - type: image
+                entity: light.luce_ingresso
+                image: /local/floorplan/bottone.png
+                style:
+                  left: 32%
+                  top: 20%
+                tap_action:
+                  action: toggle
+              - type: image
+                entity: light.luce_cucina
+                image: /local/floorplan/bottone.png
+                style:
+                  left: 45%
+                  top: 20%
+                tap_action:
+                  action: toggle
+              - type: image
+                entity: light.luce_bagno
+                image: /local/floorplan/bottone.png
+                style:
+                  left: 65%
+                  top: 20%
+                tap_action:
+                  action: toggle
+              - type: image
+                entity: light.luce_lavanderia
+                image: /local/floorplan/bottone.png
+                style:
+                  left: 67%
+                  top: 15%
+                tap_action:
+                  action: toggle
+              - type: image
+                entity: light.luce_camera
+                image: /local/floorplan/bottone.png
+                style:
+                  left: 65%
+                  top: 65%
+                tap_action:
+                  action: toggle
+              - type: image
+                entity: light.luce_sala
+                image: /local/floorplan/bottone.png
+                style:
+                  left: 45%
+                  top: 65%
+                tap_action:
+                  action: toggle
+              - type: image
+                entity: light.luce_balcone
+                image: /local/floorplan/bottone.png
+                style:
+                  left: 45%
+                  top: 65%
+                tap_action:
+                  action: toggle
+              - type: state-icon
+                entity: light.luce_ingresso
+                style:
+                  left: 32%
+                  top: 30%
+                  tap_action: null
+                tap_action:
+                  action: toggle
+              - type: state-icon
+                entity: light.luce_cucina
+                style:
+                  left: 47%
+                  top: 35%
+                  tap_action: null
+                tap_action:
+                  action: toggle
+              - type: state-icon
+                entity: light.luce_bagno
+                style:
+                  left: 63%
+                  top: 27%
+                  tap_action: null
+                tap_action:
+                  action: toggle
+              - type: state-icon
+                entity: light.luce_lavanderia
+                style:
+                  left: 67%
+                  top: 15%
+                  tap_action: null
+                tap_action:
+                  action: toggle
+              - type: state-icon
+                entity: light.luce_camera
+                style:
+                  left: 66%
+                  top: 64%
+                  tap_action: null
+                tap_action:
+                  action: toggle
+              - type: state-icon
+                entity: light.luce_sala
+                style:
+                  left: 47%
+                  top: 63%
+                  tap_action: null
+                tap_action:
+                  action: toggle
+              - type: state-icon
+                entity: light.luce_balcone
+                style:
+                  left: 54%
+                  top: 88%
+                tap_action:
+                  action: toggle
+              - type: state-label
+                entity: weather.forecast_casa
+                style:
+                  background-color: rgba(61,116,254,0.3)
+                  border-radius: 0%
+                  color: '#fff'
+                  font-size: 13px
+                  font-weight: bold
+                  left: 16%
+                  text-align: center
+                  top: 10%
+            camera_view: auto
+            state_filter: {}
+            dark_mode_image: local/floorplan/casa_notte.png
+            dark_mode_filter: >-
+              {% set entities =
+              [states['light.luce_bagno'],states['light.luce_camera'],states['light.led_cucina_rgb'],states['light.luce_cucina'],states['light.led_cucina_white'],states['light.led_cucina'],states['light.luce_ingresso'],states['light.luce_lavanderia'],states['light.luce_sala'],states['light.led_divano_s'],states['light.led_divano_c'],states['light.led_divano_d']]
+              %} {{ entities | selectattr('state','eq','on') | list | count }}
+            grid_options:
+              columns: full
+              rows: auto
+        column_span: 4
