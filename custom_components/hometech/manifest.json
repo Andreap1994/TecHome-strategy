@@ -1,9 +1,0 @@
-{
-  "domain": "hometech",
-  "name": "Dashboard",
-  "documentation": "https://github.com/Andreap1994/hometech-dashboard",
-  "requirements": [],
-  "dependencies": [],
-  "codeowners": ["Andreap1994"],
-  "iot_class": "cloud_polling"
-}
