@@ -3,7 +3,7 @@
   "name": "HomeTech Dashboard",
   "documentation": "https://github.com/Andreap1994/hometech-dashboard",
   "dependencies": [],
-  "codeowners": ["@tuo-user"],
+  "codeowners": ["HomeTech"],
   "version": "1.0.0",
   "requirements": []
 }
