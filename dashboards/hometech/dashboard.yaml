@@ -1,4 +1,0 @@
-title: HomeTech
-views:
-  - !include views/smartphone.yaml
-  - !include views/tablet.yaml
