@@ -1,7 +1,0 @@
-{
-  "name": "HomeTech",
-  "content_in_root": false,
-  "filename": "dashboards/smarthome.yaml",
-  "type": "lovelace",
-  "render_readme": true
-}
