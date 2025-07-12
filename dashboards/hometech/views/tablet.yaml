@@ -1,5 +1,1696 @@
-title: Tablet
-path: tablet
-type: sections
-subview: false
-sections: []
+kiosk_mode:
+  user_settings:
+    - users:
+        - Federica
+        - Ipad
+      hide_header: true
+      ignore_disable_km: true
+button_card_templates:
+  row_space_5:
+    template: no_background
+    styles:
+      card:
+        - height: 5px
+        - padding: 0px
+  row_space_10:
+    template: no_background
+    styles:
+      card:
+        - height: 10px
+        - padding: 0px
+  empty_card:
+    template: no_background
+    color_type: blank-card
+  no_background:
+    styles:
+      card:
+        - background-color: rgba(0, 0, 0, 0.0)
+        - box-shadow: none
+  row_space_20:
+    template: no_background
+    styles:
+      card:
+        - height: 20px
+        - padding: 0px
+  card_header:
+    styles:
+      card:
+        - height: 80px
+  sensor_card:
+    layout: icon_name_state2nd
+    show_state: true
+    styles:
+      card:
+        - padding-top: 2%
+        - padding-bottom: 2%
+      state:
+        - font-size: 140%
+        - font-weight: bold
+        - justify-self: start
+        - align-self: center
+      name:
+        - font-size: 85%
+        - justify-self: start
+        - color: var(--secondary-text-color)
+    tap_action:
+      action: none
+  button_text_label:
+    template: feedback_click
+    show_label: true
+    show_icon: false
+    styles:
+      card:
+        - height: 60px
+      name:
+        - font-size: 90%
+        - color: var(--secondary-text-color)
+        - margin-bottom: 2px
+      label:
+        - margin-top: 2px
+        - font-weight: bold
+  feedback_click:
+    styles:
+      card:
+        - '--mdc-ripple-color': var(--paper-item-icon-active-color)
+        - '--mdc-ripple-press-opacity': 0.2
+  button_icon_square:
+    template: feedback_click
+    size: 60%
+    show_name: false
+    aspect_ratio: 1/1
+  action_spotify_room:
+    entity: input_text.spotify_room
+    styles:
+      card:
+        - height: 80px
+      name:
+        - margin-bottom: 5px
+    tap_action:
+      action: call-service
+      service: script.spotify_set_room
+      service_data:
+        room: '[[[ return variables.room ]]]'
+    state:
+      - value: '[[[ return variables.room ]]]'
+        styles:
+          icon:
+            - color: var(--paper-item-icon-active-color)
+            - font-weight: bold
+          name:
+            - color: var(--paper-item-icon-active-color)
+            - font-weight: bold
+  button_horizontal:
+    layout: icon_name
+    show_icon: true
+    styles:
+      card:
+        - height: 60px
+      name:
+        - padding-right: 5px
+views:
+  - title: Tablet
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: custom:mushroom-template-card
+            primary: |-
+              {% set time = now().hour %} 
+
+              {% if (time >= 18) %} Buonasera, {{user}}! 
+
+              {% elif (time >= 12) %} Buon pomeriggio, {{user}}! 
+
+              {% elif (time >= 5) %} Buongiorno, {{user}}! 
+
+              {% else %} Ciao, {{user}}! {% endif %} 
+            icon: mdi:hand-wave
+            icon_color: orange
+            tap_action:
+              action: none
+            double_tap_action:
+              action: none
+            hold_action:
+              action: none
+            fill_container: false
+            layout: horizontal
+            secondary: >-
+              Interna: {{ states('sensor.t_u_casa_temperature') }} °C | {{
+              states('sensor.t_u_casa_humidity') }} %
+            badge_icon: ''
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 9
+              rows: auto
+          - type: custom:swipe-card
+            parameters:
+              effect: coverflow
+              autoHeight: false
+              autoplay:
+                delay: 10000
+            cards:
+              - type: custom:clock-weather-card
+                entity: weather.forecast_casa
+                sun_entity: sun.sun
+                temperature_sensor: sensor.outdoor_temm
+                humidity_sensor: sensor.outdoor_humidity
+                weather_icon_type: line
+                animated_icon: true
+                forecast_rows: 4
+                time_pattern: HH:mm
+                time_format: 24
+                date_pattern: ccc d.MM.yy
+                hide_today_section: false
+                hide_forecast_section: false
+                show_humidity: false
+                hide_clock: true
+                hide_date: true
+                hourly_forecast: false
+                use_browser_time: false
+                time_zone: null
+              - type: custom:horizon-card
+          - type: custom:mushroom-alarm-control-panel-card
+            states: []
+            fill_container: false
+            entity: alarm_control_panel.allarme
+            icon: mdi:shield-home-outline
+            show_keypad: false
+            layout: horizontal
+          - type: tile
+            entity: todo.lista_della_spesa
+            show_entity_picture: true
+            vertical: false
+            tap_action:
+              action: navigate
+              navigation_path: /todo
+            name: Lista Spesa
+          - type: tile
+            tap_action:
+              action: call-service
+              service: shopping_list.complete_all
+              target: {}
+            icon: mdi:delete
+            name: S/Carrello
+            hide_state: true
+            entity: todo.lista_della_spesa
+            show_entity_picture: false
+            color: red
+            icon_tap_action:
+              action: call-service
+              service: shopping_list.clear_completed_items
+              target: {}
+          - square: true
+            type: grid
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: custom:button-card
+                    entity: lock.smart_lock_door
+                    icon: mdi:door
+                    aspect_ratio: 4/2
+                    state:
+                      - value: locked
+                        color: red
+                        name: Porta
+                      - value: unlocked
+                        color: green
+                        name: Porta
+                        icon: mdi:door-open
+                        styles:
+                          icon:
+                            - animation: blink 2s ease infinite
+                    tap_action:
+                      action: toggle
+              - type: vertical-stack
+                cards:
+                  - type: custom:button-card
+                    entity: button.ingresso_open_door
+                    icon: mdi:key-chain-variant
+                    aspect_ratio: 4/2
+                    name: Portone
+                    tap_action:
+                      action: toggle
+            columns: 2
+            grid_options:
+              columns: 12
+              rows: 2
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#energia_annuale'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 4
+                rows: 4
+                margin: 7px
+                width_desktop: 550px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - '!default'
+              - type: vertical-stack
+                cards:
+                  - type: custom:power-flow-card-plus
+                    entities:
+                      battery:
+                        entity: ''
+                        state_of_charge: sensor.mi_9t_pro_battery_level
+                      individual:
+                        - entity: sensor.presa_smart_asciugatrice_power
+                          secondary_info:
+                            unit_white_space: true
+                          name: Asciugatrice
+                          decimals: 2
+                          display_zero: true
+                          color_value: false
+                          color_icon: true
+                          display_zero_state: true
+                          inverted_animation: false
+                          show_direction: true
+                          unit_white_space: false
+                          use_metadata: false
+                        - entity: sensor.presa_smart_lavatrice_power
+                          secondary_info:
+                            accept_negative: false
+                            color_value: false
+                            display_zero: false
+                          display_zero: true
+                          name: Lavatrice
+                          decimals: 2
+                          use_metadata: false
+                          show_direction: true
+                          inverted_animation: false
+                          unit_white_space: false
+                          color_value: false
+                          display_zero_state: true
+                      grid:
+                        secondary_info: {}
+                        entity:
+                          consumption: sensor.somma_em06_energia_annuale
+                        display_state: one_way
+                        display_zero_tolerance: 0
+                        invert_state: false
+                        use_metadata: false
+                      home:
+                        secondary_info: {}
+                        override_state: false
+                      fossil_fuel_percentage:
+                        secondary_info: {}
+                        entity: sensor.electricity_maps_intensita_della_co2
+                        display_zero: true
+                    clickable_entities: true
+                    display_zero_lines:
+                      mode: show
+                      transparency: 50
+                      grey_color:
+                        - 189
+                        - 189
+                        - 189
+                    use_new_flow_rate_model: true
+                    w_decimals: 2
+                    kw_decimals: 1
+                    min_flow_rate: 0.75
+                    max_flow_rate: 6
+                    max_expected_power: 2000
+                    min_expected_power: 0.01
+                    watt_threshold: 1000
+                    transparency_zero_lines: 0
+                    sort_individual_devices: false
+                    disable_dots: false
+                    title: Consumo annuale
+                    dashboard_link: /energy
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Annuale
+                2_name: Mensile
+                1_icon: mdi:solar-power
+                1_link: '#energia_annuale'
+                2_link: '#energia_mensile'
+                2_icon: mdi:solar-power
+                highlight_current_view: false
+                hide_gradient: true
+                styles: ''
+                rise_animation: false
+                modules:
+                  - '!default'
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#energia_mensile'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 4
+                rows: 4
+                margin: 7px
+                width_desktop: 550px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - '!default'
+              - type: vertical-stack
+                cards:
+                  - type: custom:power-flow-card-plus
+                    entities:
+                      battery:
+                        entity: ''
+                        state_of_charge: sensor.mi_9t_pro_battery_level
+                      individual:
+                        - entity: sensor.presa_smart_asciugatrice_power
+                          secondary_info:
+                            unit_white_space: true
+                          name: Asciugatrice
+                          decimals: 2
+                          display_zero: true
+                          color_value: false
+                          color_icon: true
+                          display_zero_state: true
+                          inverted_animation: false
+                          show_direction: true
+                          unit_white_space: false
+                          use_metadata: false
+                        - entity: sensor.presa_smart_lavatrice_power
+                          secondary_info:
+                            accept_negative: false
+                            color_value: false
+                            display_zero: false
+                          display_zero: true
+                          name: Lavatrice
+                          decimals: 2
+                          use_metadata: false
+                          show_direction: true
+                          inverted_animation: false
+                          unit_white_space: false
+                          color_value: false
+                          display_zero_state: true
+                      grid:
+                        secondary_info: {}
+                        entity:
+                          consumption: sensor.somma_em06_energia_mensile
+                        display_state: one_way
+                        display_zero_tolerance: 0
+                        invert_state: false
+                        use_metadata: false
+                      home:
+                        secondary_info: {}
+                        override_state: false
+                      fossil_fuel_percentage:
+                        secondary_info: {}
+                        entity: sensor.electricity_maps_intensita_della_co2
+                        display_zero: true
+                    clickable_entities: true
+                    display_zero_lines:
+                      mode: show
+                      transparency: 50
+                      grey_color:
+                        - 189
+                        - 189
+                        - 189
+                    use_new_flow_rate_model: true
+                    w_decimals: 2
+                    kw_decimals: 1
+                    min_flow_rate: 0.75
+                    max_flow_rate: 6
+                    max_expected_power: 2000
+                    min_expected_power: 0.01
+                    watt_threshold: 1000
+                    transparency_zero_lines: 0
+                    sort_individual_devices: false
+                    disable_dots: false
+                    title: Consumo mensile
+                    dashboard_link: /energy
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Annuale
+                2_name: Mensile
+                1_icon: mdi:solar-power
+                1_link: '#energia_annuale'
+                2_link: '#energia_mensile'
+                2_icon: mdi:solar-power
+                highlight_current_view: false
+                hide_gradient: true
+                styles: ''
+                rise_animation: false
+                modules:
+                  - '!default'
+      - type: grid
+        cards:
+          - clock_size: medium
+            show_seconds: true
+            type: clock
+            grid_options:
+              columns: 12
+              rows: 1
+          - type: heading
+            icon: ''
+            heading_style: subtitle
+            grid_options:
+              columns: 9
+              rows: auto
+          - type: custom:swipe-card
+            parameters:
+              effect: coverflow
+            cards:
+              - initial_view: listWeek
+                type: calendar
+                entities:
+                  - calendar.andrea
+                  - calendar.condiviso
+                  - calendar.federica
+                  - calendar.lavoro
+              - type: logbook
+                target:
+                  entity_id:
+                    - alarm_control_panel.allarme
+                  label_id:
+                    - luci
+                    - termostato
+                    - tapparelle
+                    - porta
+                    - telecamera
+                hours_to_show: 24
+                grid_options: null
+                columns: 12
+                rows: 8
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#luce'
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - '!default'
+                  - HomeTech
+                card_layout: large
+              - square: true
+                type: grid
+                cards:
+                  - type: vertical-stack
+                    cards:
+                      - type: vertical-stack
+                        cards:
+                          - type: horizontal-stack
+                            cards:
+                              - type: custom:mushroom-title-card
+                                title: Ingresso
+                          - type: custom:slider-button-card
+                            entity: light.luce_ingresso
+                            slider:
+                              direction: bottom-top
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: false
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: false
+                              tap_action:
+                                action: toggle
+                        grid_options:
+                          columns: 12
+                          rows: 2
+                      - type: vertical-stack
+                        cards:
+                          - type: horizontal-stack
+                            cards:
+                              - type: custom:mushroom-title-card
+                                title: Cucina
+                          - type: custom:slider-button-card
+                            entity: light.luce_cucina
+                            slider:
+                              direction: bottom-top
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: false
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                          - type: custom:slider-button-card
+                            entity: light.led_cucina_rgb
+                            slider:
+                              direction: left-right
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                          - type: custom:slider-button-card
+                            entity: light.led_cucina_cct
+                            slider:
+                              direction: left-right
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                  - type: vertical-stack
+                    cards:
+                      - type: vertical-stack
+                        cards:
+                          - type: horizontal-stack
+                            cards:
+                              - type: custom:mushroom-title-card
+                                title: Soggiorno
+                          - type: custom:slider-button-card
+                            entity: light.luce_sala
+                            slider:
+                              direction: left-right
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                          - type: custom:slider-button-card
+                            entity: light.led_divano_d
+                            slider:
+                              direction: left-right
+                              background: gradient
+                              use_state_color: false
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                          - type: custom:slider-button-card
+                            entity: light.led_divano_c
+                            slider:
+                              direction: left-right
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                          - type: custom:slider-button-card
+                            entity: light.led_divano_s
+                            slider:
+                              direction: left-right
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: true
+                              tap_action:
+                                action: toggle
+                  - type: vertical-stack
+                    cards:
+                      - type: vertical-stack
+                        cards:
+                          - type: horizontal-stack
+                            cards:
+                              - type: custom:mushroom-title-card
+                                title: Camera
+                          - type: custom:slider-button-card
+                            entity: light.luce_camera
+                            slider:
+                              direction: bottom-top
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: false
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: false
+                              tap_action:
+                                action: toggle
+                        grid_options:
+                          columns: 12
+                          rows: 2
+                      - type: vertical-stack
+                        cards:
+                          - type: horizontal-stack
+                            cards:
+                              - type: custom:mushroom-title-card
+                                title: Bagno
+                          - type: custom:slider-button-card
+                            entity: light.luce_bagno
+                            slider:
+                              direction: bottom-top
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: false
+                              tap_action:
+                                action: toggle
+                        grid_options:
+                          columns: 12
+                          rows: 2
+                      - type: vertical-stack
+                        cards:
+                          - type: horizontal-stack
+                            cards:
+                              - type: custom:mushroom-title-card
+                                title: Lavanderia
+                          - type: custom:slider-button-card
+                            entity: light.luce_lavanderia
+                            slider:
+                              direction: bottom-top
+                              background: gradient
+                              use_state_color: true
+                              use_percentage_bg_opacity: false
+                              show_track: false
+                              toggle_on_click: false
+                              force_square: false
+                              show_attribute: false
+                            show_name: true
+                            show_state: true
+                            compact: true
+                            icon:
+                              show: true
+                              use_state_color: true
+                              tap_action:
+                                action: more-info
+                              icon: ''
+                            action_button:
+                              mode: toggle
+                              icon: mdi:power
+                              show: false
+                              show_spinner: false
+                              tap_action:
+                                action: toggle
+                        grid_options:
+                          columns: 12
+                          rows: 2
+                columns: 3
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#sensore'
+                card_layout: normal
+                slide_to_close_distance: '400'
+                columns: 3
+                rows: 4
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - '!default'
+              - square: true
+                type: grid
+                cards:
+                  - type: custom:button-card
+                    aspect_ratio: 4/1.5
+                    show_name: false
+                    show_icon: false
+                    show_state: true
+                    layout: icon_state_name2nd
+                    styles:
+                      card:
+                        - padding: 4%
+                        - background-image: >-
+                            [[[if
+                            (states["input_boolean.cantina_vini_animata"].state
+                            == "on") return 'url("/local/gif/rilevamento
+                            fumo.png")'; else return
+                            'url("/local/gif/rilevamento fumo.png")'; ]]]
+                        - background-size: 40%
+                        - background-repeat: no-repeat
+                        - background-position: center
+                      name:
+                        - font-weight: bold
+                        - font-size: 30px
+                        - align-self: middle
+                        - justify-self: start
+                        - padding-left: 10px
+                        - padding-top: 10px
+                        - padding-bottom: 10px
+                        - letter-spacing: '-1.0px'
+                      grid:
+                        - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                        - grid-template-columns: 30% 30% 30%
+                        - grid-template-rows: 1fr 1fr
+                        - column-gap: 20px
+                      custom_fields:
+                        logo:
+                          - position: absolute
+                          - left: 10%
+                          - top: 33%
+                    custom_fields:
+                      'n':
+                        card:
+                          type: custom:button-card
+                          entity: select.rilevatore_fumo_buzzer
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i3:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.rilevatore_fumo_smoke_density
+                          show_name: false
+                          show_state: true
+                          show_icon: false
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i5:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.rilevatore_fumo_battery
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                  - type: custom:button-card
+                    aspect_ratio: 4/1.5
+                    show_name: false
+                    show_icon: false
+                    show_state: true
+                    layout: icon_state_name2nd
+                    styles:
+                      card:
+                        - padding: 4%
+                        - background-image: >-
+                            [[[if
+                            (states["input_boolean.cantina_vini_animata"].state
+                            == "on") return 'url("/local/gif/rilevamento
+                            allagamento.png")'; else return
+                            'url("/local/gif/rilevamento allagamento.png")'; ]]]
+                        - background-size: 35%
+                        - background-repeat: no-repeat
+                        - background-position: center
+                      name:
+                        - font-weight: bold
+                        - font-size: 30px
+                        - align-self: middle
+                        - justify-self: start
+                        - padding-left: 10px
+                        - padding-top: 10px
+                        - padding-bottom: 10px
+                        - letter-spacing: '-1.0px'
+                      grid:
+                        - grid-template-areas: '"n i1 i2" "i3 i4 i5"'
+                        - grid-template-columns: 30% 30% 30%
+                        - grid-template-rows: 1fr 1fr
+                        - column-gap: 20px
+                      custom_fields:
+                        logo:
+                          - position: absolute
+                          - left: 10%
+                          - top: 33%
+                    custom_fields:
+                      i3:
+                        card:
+                          type: custom:button-card
+                          entity: binary_sensor.rilevatore_acqua_lavandino
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                      i5:
+                        card:
+                          type: custom:button-card
+                          entity: sensor.rilevatore_acqua_lavandino_battery
+                          show_name: false
+                          show_state: true
+                          show_icon: null
+                          aspect_ratio: 4/1
+                          tap_action:
+                            action: more-info
+                            service: null
+                            data: {}
+                            target:
+                              entity_id:
+                                - null
+                          state:
+                            - value: 'on'
+                              icon: mdi:lightbulb-on-10
+                            - value: 'off'
+                              icon: mdi:lightbulb-outline
+                          styles:
+                            card:
+                              - background-color: '#e5e5ea'
+                              - border-radius: 35px
+                              - border-style: none
+                              - box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2)
+                            icon:
+                              - width: 30px
+                              - height: 30px
+                              - color: '#e5e5ea'
+                              - align-self: start
+                              - text-align: start
+                              - padding: 5px
+                            img_cell:
+                              - justify-content: middle
+                              - align-self: middle
+                              - margin: none
+                columns: 2
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#automazione'
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - '!default'
+              - type: custom:scheduler-card
+                include:
+                  - binary_sensor.porta_ingresso_contact
+                  - climate
+                  - cover
+                  - light.luce_ingresso
+                exclude:
+                  - climate.fan_shim
+                  - cover.tapparella_camera_l1
+                  - cover.tapparella_camera_l2
+                title: false
+                discover_existing: false
+                time_step: 10
+                sort_by:
+                  - relative-time
+                  - state
+                display_options:
+                  primary_info: default
+                  secondary_info: []
+                  icon: action
+                grid_options:
+                  columns: full
+          - type: vertical-stack
+            cards:
+              - type: custom:enhanced-shutter-card
+                entities:
+                  - entity: cover.tapparella_camera
+                    name: Camera
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Sala
+                2_name: Camera
+                1_icon: mdi:blinds-horizontal
+                1_link: '#sala_tapparella'
+                2_link: '#camera_tapparella'
+                2_icon: mdi:blinds-horizontal
+                highlight_current_view: false
+                hide_gradient: true
+                styles: ''
+                rise_animation: false
+                modules:
+                  - '!default'
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera_tapparella'
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - '!default'
+          - type: vertical-stack
+            cards:
+              - type: custom:enhanced-shutter-card
+                entities:
+                  - entity: cover.tapparella_sala
+                    name: Sala
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Sala
+                2_name: Camera
+                1_icon: mdi:blinds-horizontal
+                1_link: '#sala_tapparella'
+                2_link: '#camera_tapparella'
+                2_icon: mdi:blinds-horizontal
+                highlight_current_view: false
+                hide_gradient: true
+                styles: ''
+                rise_animation: false
+                modules:
+                  - '!default'
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#sala_tapparella'
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - '!default'
+          - type: vertical-stack
+            cards:
+              - type: thermostat
+                entity: climate.termostato_sala
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Sala
+                2_name: Camera
+                1_icon: mdi:home-thermometer-outline
+                1_link: '#sala_termostato'
+                2_link: '#camera_termostato'
+                2_icon: mdi:home-thermometer-outline
+                highlight_current_view: false
+                hide_gradient: true
+                styles: ''
+                rise_animation: false
+                modules:
+                  - '!default'
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#sala_termostato'
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - '!default'
+          - type: vertical-stack
+            cards:
+              - type: thermostat
+                entity: climate.termostato_camera
+              - type: custom:bubble-card
+                card_type: horizontal-buttons-stack
+                auto_order: true
+                1_name: Sala
+                2_name: Camera
+                1_icon: mdi:home-thermometer-outline
+                1_link: '#sala_termostato'
+                2_link: '#camera_termostato'
+                2_icon: mdi:home-thermometer-outline
+                highlight_current_view: false
+                hide_gradient: true
+                styles: ''
+                rise_animation: false
+                modules:
+                  - '!default'
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera_termostato'
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - '!default'
+        column_span: 1
+      - type: grid
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: '#luce'
+                double_tap_action:
+                  action: perform-action
+                  target:
+                    area_id:
+                      - bagno
+                      - camera_da_letto
+                      - cucina
+                      - ingresso
+                      - lavanderia
+                      - soggiorno
+                      - balcone
+                  perform_action: light.turn_off
+                  data: {}
+                icon: mdi:lamps-outline
+                icon_color: amber
+                content: >-
+                  {% set entities = [states['light.luce_bagno'],
+                  states['light.luce_camera'], states['light.led_cucina_rgb'],
+                  states['light.luce_cucina'], states['light.led_cucina_white'],
+
+                  states['light.led_cucina'], states['light.luce_ingresso'],
+                  states['light.luce_lavanderia'], states['light.luce_sala'],
+                  states['light.led_divano_s'], states['light.led_divano_c'],
+                  states['light.led_divano_d']] %} {{ entities |
+                  selectattr('state','eq','on') | list | count }}
+              - type: template
+                icon: mdi:blinds-horizontal
+                icon_color: cyan
+                content: >-
+                  {% set entities = [states['cover.tapparella_camera'],
+                  states['cover.tapparella_sala']] %}{{ entities |
+                  selectattr('state','eq','open') | list | count }}
+                tap_action:
+                  action: navigate
+                  navigation_path: '#sala_tapparella'
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: call-service
+                  service: cover.close_cover
+                  target:
+                    area_id:
+                      - soggiorno
+                      - camera
+              - type: template
+                icon: mdi:home-thermometer-outline
+                icon_color: orange
+                content: >-
+                  {% set entities = [states['climate.termostato_camera'],
+                  states['climate.termostato_sala']] %} {{ entities |
+                  selectattr('state','ne','off') | list | count }}
+                tap_action:
+                  action: navigate
+                  navigation_path: '#sala_termostato'
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: perform-action
+                  target:
+                    label_id: termostato
+                  perform_action: climate.turn_off
+                  data: {}
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: '#automazione'
+                icon: mdi:robot
+                icon_color: green
+                content: |-
+                  {% set entities = [
+                    states['switch.schedule_tapparella_sala'], states['switch.schedule_tapparella_camera'], states['switch.schedule_luce_ingresso']] %} 
+                  {{ entities | selectattr('state','eq','on') | list | count }}
+              - type: template
+                icon: mdi:leak
+                icon_color: blue
+                content: ''
+                tap_action:
+                  action: navigate
+                  navigation_path: '#sensore'
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: call-service
+                  service: switch.turn_off
+                  target:
+                    entity_id: switch.presa_smart
+            alignment: center
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: '#energia_annuale'
+                icon: mdi:home-lightning-bolt-outline
+                icon_color: amber
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: '#j.a.r.v.i.s'
+                icon: mdi:raspberry-pi
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: /config
+                icon: mdi:cog
+                icon_color: grey
+            alignment: center
+          - type: custom:advanced-camera-card
+            cameras:
+              - camera_entity: camera.sala_scorrevole
+            performance:
+              features:
+                card_loading_indicator: true
+                animated_progress_indicator: true
+            live:
+              preload: false
+            menu:
+              style: hover
+              buttons:
+                expand:
+                  enabled: false
+                image:
+                  enabled: false
+                play:
+                  enabled: false
+                ptz_controls:
+                  enabled: false
+                recordings:
+                  enabled: false
+                timeline:
+                  enabled: false
+                clips:
+                  enabled: true
+                mute:
+                  enabled: false
+                iris:
+                  enabled: false
+                substreams:
+                  enabled: false
+            view:
+              triggers:
+                show_trigger_status: false
+            profiles:
+              - casting
+            folders: []
+          - type: picture-elements
+            elements:
+              - type: image
+                title: casa
+                image: /local/gif/home.png
+                style:
+                  left: 50.5%
+                  top: 50%
+                  width: 25%
+              - type: image
+                title: energia
+                style:
+                  left: 50%
+                  top: 12%
+                  width: 15%
+                image: /local/gif/energia.png
+              - type: state-label
+                entity: sensor.somma_em06_power
+                style:
+                  left: 50%
+                  top: 35%
+                  font-size: 20px
+              - type: image
+                image: /local/gif/freccia.png
+                title: freccia
+                style:
+                  left: 50%
+                  top: 25%
+                  width: 5%
+              - type: image
+                image: /local/gif/freccia.png
+                title: freccia
+                style:
+                  left: 30%
+                  top: 60%
+                  width: 5%
+                  transform: rotate(50deg)
+              - type: image
+                image: /local/gif/freccia.png
+                title: freccia
+                style:
+                  left: 50%
+                  top: 65%
+                  width: 5%
+              - type: image
+                image: /local/gif/freccia.png
+                title: freccia
+                style:
+                  left: 67%
+                  top: 60%
+                  width: 5%
+                  transform: rotate(310deg)
+              - type: state-label
+                entity: sensor.somma_em06_consumi
+                style:
+                  left: 80%
+                  top: 20%
+                  font-size: 20px
+                  background-color: rgba(153, 153, 153, 0.8)
+                  color: white
+            image: /local/gif/sfondo2.png
+            grid_options:
+              columns: 12
+              rows: 6
+          - type: vertical-stack
+            cards:
+              - type: vertical-stack
+                cards:
+                  - square: true
+                    type: grid
+                    cards:
+                      - type: vertical-stack
+                        cards:
+                          - type: custom:mushroom-update-card
+                            entity: update.home_assistant_supervisor_update
+                            fill_container: true
+                            layout: horizontal
+                          - type: custom:mushroom-update-card
+                            entity: update.home_assistant_core_update
+                            fill_container: true
+                            layout: horizontal
+                          - type: custom:mushroom-update-card
+                            entity: update.home_assistant_operating_system_update
+                            fill_container: true
+                            layout: horizontal
+                          - type: tile
+                            vertical: false
+                            state_content: state
+                            grid_options:
+                              columns: 12
+                              rows: 1
+                            entity: sensor.uptime
+                            name: 'Tempo di accensione:'
+                            features_position: bottom
+                          - type: vertical-stack
+                            cards:
+                              - type: entity
+                                entity: binary_sensor.remote_ui
+                              - type: entity
+                                entity: binary_sensor.rpi_power_status
+                      - square: true
+                        type: grid
+                        cards:
+                          - graph: line
+                            type: sensor
+                            detail: 1
+                            entity: sensor.speedtest_scarica
+                            name: 'Download '
+                          - graph: line
+                            type: sensor
+                            detail: 1
+                            entity: sensor.speedtest_carica
+                            name: Upload
+                          - graph: line
+                            type: sensor
+                            detail: 1
+                            entity: sensor.speedtest_ping
+                            name: Ping
+                        columns: 2
+                    columns: 2
+                  - type: custom:bubble-card
+                    card_type: pop-up
+                    hash: '#j.a.r.v.i.s'
+                    margin: 7px
+                    width_desktop: 1000px
+                    show_header: false
+                    button_type: name
+                    modules:
+                      - HomeTech
+                      - '!default'
+                    card_layout: large
+                    margin_top_mobile: 0px
+                    margin_top_desktop: 0px
+                    hide_backdrop: false
+    icon: mdi:tablet
+    cards: []
+    max_columns: 3
+    dense_section_placement: false
+    header:
+      layout: start
+      badges_position: bottom
+    badges:
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: binary_sensor.sala_movimento
+        visibility:
+          - condition: state
+            entity: binary_sensor.porta_ingresso_contact
+            state: 'on'
+        name: Porta ingresso
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: binary_sensor.finestra_camera_contact
+        name: Finestra camera
+        show_entity_picture: false
+        visibility:
+          - condition: state
+            entity: binary_sensor.finestra_camera_contact
+            state: 'on'
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: binary_sensor.finestra_sala_contact
+        show_entity_picture: false
+        visibility:
+          - condition: state
+            entity: binary_sensor.finestra_sala_contact
+            state: 'on'
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: binary_sensor.sala_movimento
+        show_entity_picture: false
+        visibility:
+          - condition: state
+            entity: binary_sensor.movimento_sala
+            state: 'on'
+          - condition: and
+            conditions:
+              - condition: state
+                entity: alarm_control_panel.allarme
+                state_not: disarmed
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: sensor.finestra_sala_battery
+        show_entity_picture: false
+        visibility:
+          - condition: numeric_state
+            entity: binary_sensor.finestra_sala_contact
+            below: 20
+        name: Finestra sala
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: sensor.finestra_camera_battery
+        name: Finestra camera
+        show_entity_picture: false
+        visibility:
+          - condition: numeric_state
+            entity: sensor.finestra_camera_battery
+            below: 20
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: sensor.sensore_movimento_battery
+        name: Sensore movimento
+        show_entity_picture: false
+        visibility:
+          - condition: numeric_state
+            entity: sensor.finestra_camera_battery
+            below: 20
+        tap_action:
+          action: none
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        entity: sensor.ingresso_batteria
+        visibility:
+          - condition: numeric_state
+            entity: sensor.ingresso_batteria
+            below: 20
+        tap_action:
+          action: none
+        name: Batteria ingresso
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        visibility:
+          - condition: state
+            entity: binary_sensor.smart_lock_door_battery_critical
+            state: 'on'
+        entity: sensor.none_battery
+        tap_action:
+          action: none
+        name: Batteria porta
