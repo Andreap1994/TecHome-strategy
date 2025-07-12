@@ -1,0 +1,27 @@
+kiosk_mode:
+  user_settings:
+    - users:
+        - Federica
+        - Ipad
+      hide_header: true
+      ignore_disable_km: true
+views:
+  - title: Smartphone
+    type: sections
+    max_columns: 1
+    subview: false
+    sections:
+      - type: grid
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: '#luce'
+                icon: mdi:lamps-outline
+                icon_color: amber
+                content: >
+                  {% set entities = [
+                  states['light.luce_bagno'], states['light.luce_camera']
+                  ] %} {{ entities | selectattr('state','eq','on') | list | count }}

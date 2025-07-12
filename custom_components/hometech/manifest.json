@@ -1,0 +1,9 @@
+{
+  "domain": "hometech",
+  "name": "HomeTech Dashboard",
+  "documentation": "https://github.com/tuo-user/hometech-dashboard",
+  "dependencies": [],
+  "codeowners": ["@tuo-user"],
+  "version": "1.0.0",
+  "requirements": []
+}
