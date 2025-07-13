@@ -1,9 +1,0 @@
-{
-  "domain": "hometech",
-  "name": "HomeTech Dashboard",
-  "documentation": "https://github.com/Andreap1994/hometech-dashboard",
-  "dependencies": [],
-  "codeowners": ["HomeTech"],
-  "version": "1.0.0",
-  "requirements": []
-}
