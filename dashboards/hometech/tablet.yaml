@@ -1,3 +1,0 @@
-title: Tablet
-views:
-  - !include views/tablet.yaml
