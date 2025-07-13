@@ -1,1 +1,9 @@
-
+{
+  "domain": "hometech",
+  "name": "HomeTech Strategy",
+  "documentation": "https://github.com/Andreap1994/hometech-strategy",
+  "dependencies": [],
+  "codeowners": ["Andreap1994"],
+  "version": "1.0.0",
+  "requirements": []
+}
