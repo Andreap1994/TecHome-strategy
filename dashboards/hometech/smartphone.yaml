@@ -1,6 +1,0 @@
-title: HomeTech
-path: home
-icon: mdi:home
-layout: vertical
-views:
-   - !include views/smartphone.yaml
