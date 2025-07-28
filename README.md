@@ -1,3 +1,3 @@
 # HomeTech Dashboard
 
-Dashboard Lovelace ottimizzata, due plancia Smarphone e Tablet.
+Dashboard Lovelace ottimizzata, plancie per Smarphone e Tablet.
