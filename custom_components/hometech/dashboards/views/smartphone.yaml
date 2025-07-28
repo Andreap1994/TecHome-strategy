@@ -12,7 +12,7 @@ layout: vertical
 cards:
   - type: vertical-stack
     cards:
-      - type: custom:mushroom-chips-card
+      - type: custom:mushroom-chips-card ##chips
         alignment: center
         chips:
           - type: template
@@ -101,8 +101,8 @@ cards:
               navigation_path: "#energia_annuale"
             icon: mdi:home-lightning-bolt-outline
             icon_color: amber
-            content: "" ##chips
-      - type: custom:mushroom-template-card
+            content: ""
+      - type: custom:mushroom-template-card ##messaggio benvenuto
         primary: >-
           {% set time = now().hour %}
           {% if (time >= 18) %} Buonasera, {{user}}!
@@ -114,8 +114,8 @@ cards:
         layout: horizontal
         secondary: >-
           Interna: {{ states('sensor.t_u_casa_temperature') }} °C |
-          {{ states('sensor.t_u_casa_humidity') }} % ##messaggio benvenuto
-      - type: custom:swipe-card
+          {{ states('sensor.t_u_casa_humidity') }} %
+      - type: custom:swipe-card  ##meteo e alba
         parameters:
           effect: flip
           autoHeight: false
@@ -141,7 +141,7 @@ cards:
             hourly_forecast: false
             use_browser_time: false
             time_zone: null
-          - type: custom:horizon-card ##meteo e alba
+          - type: custom:horizon-card
       - type: grid ##pulsanti
         square: true
         columns: 4
@@ -184,7 +184,7 @@ cards:
             icon: mdi:raspberry-pi
             hold_action:
               action: none
-      - type: custom:swipe-card
+      - type: custom:swipe-card ##disegno esergia e calendario
         parameters:
           effect: coverflow
         cards:
@@ -269,8 +269,8 @@ cards:
                 - tapparelle
                 - porta
                 - telecamera
-            hours_to_show: 24 ##disegno esergia e calendario
-      - type: vertical-stack
+            hours_to_show: 24 
+      - type: vertical-stack  ##porte
         cards:
           - type: vertical-stack
             cards:
@@ -342,7 +342,7 @@ cards:
             button_type: name
             modules:
               - HomeTech
-              - "!default" ##porte
+              - "!default"
       - type: vertical-stack ## luci
         cards:
           - type: custom:auto-entities
@@ -369,7 +369,7 @@ cards:
             modules:
               - HomeTech
               - "!default"
-      - type: vertical-stack
+      - type: vertical-stack  ## tapparelle
         cards:
           - type: custom:auto-entities
             card:
@@ -388,8 +388,8 @@ cards:
             button_type: name
             modules:
               - HomeTech
-              - "!default" ## tapparelle
-      - type: vertical-stack
+              - "!default"
+      - type: vertical-stack  ## termostati
         cards:
           - type: custom:auto-entities
             filter:
@@ -421,4 +421,161 @@ cards:
             button_type: name
             modules:
               - HomeTech
-              - "!default" ## termostati
+              - "!default"
+      - type: vertical-stack ##automazioni
+        cards:
+          - type: custom:scheduler-card
+            include:
+              - alarm_control_panel
+              - climate
+              - cover
+              - light
+            exclude: []
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: "#automazioni"
+            margin: 7px
+            width_desktop: 1000px
+            show_header: false
+            button_type: name
+            modules:
+              - HomeTech
+              - "!default"
+      - type: vertical-stack ##server
+        cards:
+          - type: picture
+            image: >-
+              https://www.pi-shop.ch/media/catalog/product/cache/1/image/363x/040ec09b1e35df139433887a97daa66f/t/h/thumbnail_11__2.jpg
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+          - type: custom:mushroom-update-card
+            entity: update.home_assistant_supervisor_update
+            fill_container: true
+            layout: horizontal
+            show_buttons_control: false
+            collapsible_controls: false
+            icon: mdi:package
+          - type: custom:mushroom-update-card
+            entity: update.home_assistant_core_update
+            fill_container: true
+            layout: horizontal
+            icon: mdi:package
+          - type: custom:mushroom-update-card
+            entity: update.home_assistant_operating_system_update
+            fill_container: true
+            layout: horizontal
+            icon: mdi:package
+          - type: tile
+            vertical: false
+            state_content: state
+            grid_options:
+              columns: 12
+              rows: 1
+            entity: sensor.uptime
+            name: "Tempo di accensione:"
+            features_position: bottom
+          - type: horizontal-stack
+            cards:
+              - type: entity
+                entity: binary_sensor.rpi_power_status
+          - square: true
+            type: grid
+            cards:
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.speedtest_scarica
+                name: "Download "
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.speedtest_carica
+                name: Upload
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.speedtest_ping
+                name: Ping
+            title: Speedtest
+            columns: 2
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: "#j.a.r.v.i.s"
+            margin: 7px
+            width_desktop: 1000px
+            show_header: false
+            button_type: name
+            modules:
+              - HomeTech
+              - "!default"
+      - type: vertical-stack ##telecamere
+        cards:
+          - type: picture
+            image: >-
+              https://www.pi-shop.ch/media/catalog/product/cache/1/image/363x/040ec09b1e35df139433887a97daa66f/t/h/thumbnail_11__2.jpg
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+          - type: custom:mushroom-update-card
+            entity: update.home_assistant_supervisor_update
+            fill_container: true
+            layout: horizontal
+            show_buttons_control: false
+            collapsible_controls: false
+            icon: mdi:package
+          - type: custom:mushroom-update-card
+            entity: update.home_assistant_core_update
+            fill_container: true
+            layout: horizontal
+            icon: mdi:package
+          - type: custom:mushroom-update-card
+            entity: update.home_assistant_operating_system_update
+            fill_container: true
+            layout: horizontal
+            icon: mdi:package
+          - type: tile
+            vertical: false
+            state_content: state
+            grid_options:
+              columns: 12
+              rows: 1
+            entity: sensor.uptime
+            name: "Tempo di accensione:"
+            features_position: bottom
+          - type: horizontal-stack
+            cards:
+              - type: entity
+                entity: binary_sensor.rpi_power_status
+          - square: true
+            type: grid
+            cards:
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.speedtest_scarica
+                name: "Download "
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.speedtest_carica
+                name: Upload
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.speedtest_ping
+                name: Ping
+            title: Speedtest
+            columns: 2
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: "#j.a.r.v.i.s"
+            margin: 7px
+            width_desktop: 1000px
+            show_header: false
+            button_type: name
+            modules:
+              - HomeTech
+              - "!default"
