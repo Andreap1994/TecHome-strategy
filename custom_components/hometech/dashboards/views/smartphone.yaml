@@ -1,4 +1,4 @@
-kiosk_mode:
+:
   user_settings:
     - users:
         - Federica
@@ -506,75 +506,6 @@ cards:
             modules:
               - HomeTech
               - "!default"
-      - type: vertical-stack ##telecamere
-        cards:
-          - type: picture
-            image: >-
-              https://www.pi-shop.ch/media/catalog/product/cache/1/image/363x/040ec09b1e35df139433887a97daa66f/t/h/thumbnail_11__2.jpg
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-          - type: custom:mushroom-update-card
-            entity: update.home_assistant_supervisor_update
-            fill_container: true
-            layout: horizontal
-            show_buttons_control: false
-            collapsible_controls: false
-            icon: mdi:package
-          - type: custom:mushroom-update-card
-            entity: update.home_assistant_core_update
-            fill_container: true
-            layout: horizontal
-            icon: mdi:package
-          - type: custom:mushroom-update-card
-            entity: update.home_assistant_operating_system_update
-            fill_container: true
-            layout: horizontal
-            icon: mdi:package
-          - type: tile
-            vertical: false
-            state_content: state
-            grid_options:
-              columns: 12
-              rows: 1
-            entity: sensor.uptime
-            name: "Tempo di accensione:"
-            features_position: bottom
-          - type: horizontal-stack
-            cards:
-              - type: entity
-                entity: binary_sensor.rpi_power_status
-          - square: true
-            type: grid
-            cards:
-              - graph: line
-                type: sensor
-                detail: 1
-                entity: sensor.speedtest_scarica
-                name: "Download "
-              - graph: line
-                type: sensor
-                detail: 1
-                entity: sensor.speedtest_carica
-                name: Upload
-              - graph: line
-                type: sensor
-                detail: 1
-                entity: sensor.speedtest_ping
-                name: Ping
-            title: Speedtest
-            columns: 2
-          - type: custom:bubble-card
-            card_type: pop-up
-            hash: "#j.a.r.v.i.s"
-            margin: 7px
-            width_desktop: 1000px
-            show_header: false
-            button_type: name
-            modules:
-              - HomeTech
-              - "!default"
       - type: vertical-stack ##energia annuale
         cards:
           - type: vertical-stack
@@ -764,6 +695,61 @@ cards:
           - type: custom:bubble-card
             card_type: pop-up
             hash: "#energia_mensile"
+            margin: 7px
+            width_desktop: 1000px
+            show_header: false
+            button_type: name
+            modules:
+              - HomeTech
+              - "!default"
+      - type: vertical-stack ##telecamera
+        cards:
+          - type: custom:advanced-camera-card
+            cameras:
+              - camera_entity: camera.sala_scorrevole
+            performance:
+              features:
+                card_loading_indicator: true
+                animated_progress_indicator: true
+            live:
+              preload: false
+            menu:
+              style: hover
+              buttons:
+                expand:
+                  enabled: false
+                image:
+                  enabled: false
+                play:
+                  enabled: false
+                ptz_controls:
+                  enabled: false
+                recordings:
+                  enabled: false
+                timeline:
+                  enabled: false
+                clips:
+                  enabled: true
+                mute:
+                  enabled: false
+                iris:
+                  enabled: false
+                substreams:
+                  enabled: false
+            view:
+              triggers:
+                show_trigger_status: false
+            profiles:
+              - casting
+            folders: []
+          - type: entities
+            entities:
+              - entity: siren.sala_sirena
+              - entity: binary_sensor.sala_persona
+                name: Rilevamento persona
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: "#telecamera"
             margin: 7px
             width_desktop: 1000px
             show_header: false
