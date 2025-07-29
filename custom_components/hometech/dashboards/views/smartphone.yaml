@@ -74,7 +74,7 @@ cards:
           - type: template
             tap_action:
               action: navigate
-              navigation_path: "#automazione"
+              navigation_path: "#automazioni"
             icon: mdi:robot
             icon_color: green
             content: >-
@@ -396,15 +396,11 @@ cards:
               include:
                 - options:
                     type: custom:mushroom-climate-card
-                    hvac_modes:
-                      - "off"
-                      - heat
-                      - cool
                     show_temperature_control: true
                     fill_container: true
-                    layout: horizontal
-                    primary_info: state
-                    secondary_info: humidity
+                    layout: vertical
+                    primary_info: name
+                    secondary_info: state
                   label: termostato
                   sort:
                     method: attribute
