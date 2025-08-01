@@ -13,7 +13,6 @@ cards:
   - type: vertical-stack
     cards:
       - type: custom:mushroom-chips-card ##chips
-        alignment: center
         chips:
           - type: template
             tap_action:
@@ -22,55 +21,42 @@ cards:
             double_tap_action:
               action: perform-action
               target:
-                label_id: luci
+                label_id: luce
               perform_action: light.turn_off
               data: {}
             icon: mdi:lamps-outline
             icon_color: amber
-            content: >-
-              {% set entities = [
-                states['light.luce_bagno'], states['light.luce_camera'],
-                states['light.led_cucina_rgb'], states['light.luce_cucina'],
-                states['light.led_cucina_white'], states['light.led_cucina'],
-                states['light.luce_ingresso'], states['light.luce_lavanderia'],
-                states['light.luce_sala'], states['light.luce_balcone'],
-                states['light.led_divano_s'], states['light.led_divano_c'],
-                states['light.led_divano_d']] %}
-              {{ entities | selectattr('state','eq','on') | list | count }}
+            content: "{{ states('sensor.luci_accese') }}"
           - type: template
+            icon: mdi:blinds-horizontal
+            icon_color: cyan
+            content: "{{ states('sensor.tapparelle_aperte') }}"
             tap_action:
               action: navigate
               navigation_path: "#tapparelle"
+            hold_action:
+              action: none
             double_tap_action:
               action: perform-action
               target:
-                label_id: tapparelle
+                label_id: tapparella
               perform_action: cover.close_cover
               data: {}
-            icon: mdi:blinds-horizontal
-            icon_color: cyan
-            content: >-
-              {% set entities = [
-                states['cover.tapparella_sala'],
-                states['cover.tapparella_camera']] %}
-              {{ entities | selectattr('state','eq','open') | list | count }}
           - type: template
+            icon: mdi:home-thermometer-outline
+            icon_color: orange
+            content: "{{ states('sensor.termostati_attivi') }}"
             tap_action:
               action: navigate
               navigation_path: "#termostati"
+            hold_action:
+              action: none
             double_tap_action:
               action: perform-action
               target:
                 label_id: termostato
               perform_action: climate.turn_off
               data: {}
-            icon: mdi:home-thermometer-outline
-            icon_color: orange
-            content: >-
-              {% set entities = [
-                states['climate.termostato_camera'],
-                states['climate.termostato_sala']] %}
-              {{ entities | selectattr('state','ne','off') | list | count }}
           - type: template
             tap_action:
               action: navigate
@@ -79,29 +65,32 @@ cards:
             icon_color: green
             content: >-
               {% set entities = [
-                states['switch.schedule_tapparella_sala'],
-                states['switch.schedule_tapparella_camera'],
-                states['switch.schedule_luce_ingresso']] %}
-              {{ entities | selectattr('state','eq','on') | list | count }}
+        
+              states['switch.schedule_tapparella_sala'],
+              states['switch.schedule_tapparella_camera'],
+              states['switch.schedule_luce_ingresso']] %}{{ entities |
+              selectattr('state','eq','on') | list | count }}
           - type: template
+            icon: mdi:leak
+            icon_color: blue
+            content: ""
             tap_action:
               action: navigate
               navigation_path: "#sensori"
+            hold_action:
+              action: none
             double_tap_action:
               action: call-service
               service: switch.turn_off
               target:
                 entity_id: switch.presa_smart
-            icon: mdi:leak
-            icon_color: blue
-            content: ""
           - type: template
             tap_action:
               action: navigate
               navigation_path: /energy
             icon: mdi:home-lightning-bolt-outline
             icon_color: amber
-            content: ""
+        alignment: center
       - type: custom:mushroom-template-card ##messaggio benvenuto
         primary: >-
           {% set time = now().hour %}
@@ -317,7 +306,7 @@ cards:
                   - type: vertical-stack
                     cards:
                       - type: custom:button-card
-                        entity: button.ingresso_open_door
+                        entity: button.portone_apri_la_porta
                         icon: mdi:key-chain-variant
                         aspect_ratio: 4/3
                         name: Portone
