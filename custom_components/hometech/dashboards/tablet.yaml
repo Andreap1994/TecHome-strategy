@@ -1,1 +1,6 @@
-
+title: HomeTech
+path: home
+icon: mdi:home
+layout: vertical
+views:
+   - !include views/tablet.yaml
