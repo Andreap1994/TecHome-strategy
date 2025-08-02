@@ -1,64 +1,412 @@
-type: picture-elements
-elements:
-  - type: image
-    title: casa
-    image: /local/gif/home.png
-    style:
-      left: 50.5%
-      top: 50%
-      width: 25%
-  - type: image
-    title: energia
-    style:
-      left: 50%
-      top: 12%
-      width: 15%
-    image: /local/gif/energia.png
-  - type: state-label
-    entity: sensor.somma_em06_power
-    style:
-      left: 50%
-      top: 35%
-      font-size: 20px
-  - type: image
-    image: /local/gif/freccia.png
-    title: freccia
-    style:
-      left: 50%
-      top: 25%
-      width: 5%
-  - type: image
-    image: /local/gif/freccia.png
-    title: freccia
-    style:
-      left: 30%
-      top: 60%
-      width: 5%
-      transform: rotate(50deg)
-  - type: image
-    image: /local/gif/freccia.png
-    title: freccia
-    style:
-      left: 50%
-      top: 65%
-      width: 5%
-  - type: image
-    image: /local/gif/freccia.png
-    title: freccia
-    style:
-      left: 67%
-      top: 60%
-      width: 5%
-      transform: rotate(310deg)
-  - type: state-label
-    entity: sensor.somma_em06_consumi
-    style:
-      left: 80%
-      top: 20%
-      font-size: 20px
-      background-color: rgba(153, 153, 153, 0.8)
-      color: white
-image: /local/gif/sfondo2.png
-grid_options:
-  columns: 12
-  rows: 6
+title: HomeTech
+path: home
+icon: mdi:home
+type: panel
+cards:
+  - type: grid
+    square: true
+    columns: 3
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-template-card
+            primary: >-
+              {% set time = now().hour %} 
+              {% if (time >= 18) %} Buonasera, {{user}}! 
+              {% elif (time >= 12) %} Buon pomeriggio, {{user}}! 
+              {% elif (time >= 5) %} Buongiorno, {{user}}! 
+              {% else %} Ciao, {{user}}! {% endif %}
+            icon: mdi:hand-wave
+            icon_color: orange
+            tap_action:
+              action: none
+            double_tap_action:
+              action: none
+            hold_action:
+              action: none
+            fill_container: false
+            layout: horizontal
+            secondary: >-
+              Interna: {{ states('sensor.t_u_casa_temperature') }} °C | {{ states('sensor.t_u_casa_humidity') }} %
+            badge_icon: ""
+          - type: custom:swipe-card
+            parameters:
+              effect: coverflow
+              autoHeight: false
+              autoplay:
+                delay: 10000
+            cards:
+              - type: custom:clock-weather-card
+                entity: weather.forecast_casa
+                sun_entity: sun.sun
+                temperature_sensor: sensor.outdoor_temm
+                humidity_sensor: sensor.outdoor_humidity
+                weather_icon_type: line
+                animated_icon: true
+                forecast_rows: 4
+                time_pattern: HH:mm
+                time_format: 24
+                date_pattern: ccc d.MM.yy
+                hide_today_section: false
+                hide_forecast_section: false
+                show_humidity: false
+                hide_clock: true
+                hide_date: true
+                hourly_forecast: false
+                use_browser_time: false
+                time_zone: null
+              - type: custom:horizon-card
+          - type: custom:mushroom-alarm-control-panel-card
+            states: []
+            fill_container: false
+            entity: alarm_control_panel.allarme
+            icon: mdi:shield-home-outline
+            show_keypad: false
+            layout: horizontal
+          - type: grid
+            square: true
+            columns: 2
+            grid_options:
+              columns: 12
+              rows: 2
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: custom:button-card
+                    entity: lock.smart_lock_door
+                    icon: mdi:door
+                    aspect_ratio: 4/2
+                    state:
+                      - value: locked
+                        color: red
+                        name: Porta
+                      - value: unlocked
+                        color: green
+                        name: Porta
+                        icon: mdi:door-open
+                        styles:
+                          icon:
+                            - animation: blink 2s ease infinite
+                    tap_action:
+                      action: toggle
+              - type: vertical-stack
+                cards:
+                  - type: custom:button-card
+                    entity: button.ingresso_open_door
+                    icon: mdi:key-chain-variant
+                    aspect_ratio: 4/2
+                    name: Portone
+                    tap_action:
+                      action: toggle
+
+      - type: vertical-stack
+        cards:
+          - type: clock
+            clock_size: medium
+            show_seconds: true
+          - type: custom:swipe-card
+            parameters:
+              effect: coverflow
+            cards:
+              - type: calendar
+                initial_view: listWeek
+                entities:
+                  - calendar.andrea
+                  - calendar.condiviso
+                  - calendar.federica
+                  - calendar.lavoro
+              - type: logbook
+                target:
+                  entity_id:
+                    - alarm_control_panel.allarme
+                  label_id:
+                    - luci
+                    - termostato
+                    - tapparelle
+                    - porta
+                    - telecamera
+                hours_to_show: 24
+                grid_options: null
+                columns: 12
+                rows: 8
+
+      - type: vertical-stack
+        cards: 
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: "#luci"
+                double_tap_action:
+                  action: perform-action
+                  target:
+                    area_id:
+                      - bagno
+                      - camera_da_letto
+                      - cucina
+                      - ingresso
+                      - lavanderia
+                      - soggiorno
+                      - balcone
+                  perform_action: light.turn_off
+                  data: {}
+                icon: mdi:lamps-outline
+                icon_color: amber
+                content: "{{ states('sensor.luci_accese') }}"
+              - type: template
+                icon: mdi:blinds-horizontal
+                icon_color: cyan
+                content: "{{ states('sensor.tapparelle_aperte') }}"
+                tap_action:
+                  action: navigate
+                  navigation_path: "#tapparelle"
+                double_tap_action:
+                  action: call-service
+                  service: cover.close_cover
+                  target:
+                    area_id:
+                      - soggiorno
+                      - camera
+              - type: template
+                icon: mdi:home-thermometer-outline
+                icon_color: orange
+                content: "{{ states('sensor.termostati_attivi') }}"
+                tap_action:
+                  action: navigate
+                  navigation_path: "#termostati"
+                double_tap_action:
+                  action: perform-action
+                  target:
+                    label_id: termostato
+                  perform_action: climate.turn_off
+                  data: {}
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: "#automazioni"
+                icon: mdi:robot
+                icon_color: green
+                content: >-
+                  {% set entities = [
+                    states['switch.schedule_tapparella_sala'], 
+                    states['switch.schedule_tapparella_camera'], 
+                    states['switch.schedule_luce_ingresso']
+                  ] %} 
+                  {{ entities | selectattr('state','eq','on') | list | count }}
+              - type: template
+                icon: mdi:leak
+                icon_color: blue
+                content: ""
+                tap_action:
+                  action: navigate
+                  navigation_path: "#sensori"
+                double_tap_action:
+                  action: call-service
+                  service: switch.turn_off
+                  target:
+                    entity_id: switch.presa_smart
+            alignment: center
+
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: "/energy"
+                icon: mdi:home-lightning-bolt-outline
+                icon_color: amber
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: "#server"
+                icon: mdi:raspberry-pi
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: /config
+                icon: mdi:cog
+                icon_color: grey
+            alignment: center
+
+          - type: custom:advanced-camera-card
+            cameras:
+              - camera_entity: camera.sala_scorrevole
+            performance:
+              features:
+                card_loading_indicator: true
+                animated_progress_indicator: true
+            live:
+              preload: false
+            menu:
+              style: hover
+              buttons:
+                expand:
+                  enabled: false
+                image:
+                  enabled: false
+                play:
+                  enabled: false
+                ptz_controls:
+                  enabled: false
+                recordings:
+                  enabled: false
+                timeline:
+                  enabled: false
+                clips:
+                  enabled: true
+                mute:
+                  enabled: false
+                iris:
+                  enabled: false
+                substreams:
+                  enabled: false
+            view:
+              triggers:
+                show_trigger_status: false
+            profiles:
+              - casting
+            folders: []
+
+          - type: picture-elements
+            elements:
+              - type: image
+                title: casa
+                image: /local/gif/home.png
+                style:
+                  left: 50.5%
+                  top: 50%
+                  width: 25%
+              - type: image
+                title: energia
+                image: /local/gif/energia.png
+                style:
+                  left: 50%
+                  top: 12%
+                  width: 15%
+              - type: state-label
+                entity: sensor.somma_em06_power
+                style:
+                  left: 50%
+                  top: 35%
+                  font-size: 20px
+              - type: image
+                image: /local/gif/freccia.png
+                title: freccia
+                style:
+                  left: 50%
+                  top: 25%
+                  width: 5%
+              - type: image
+                image: /local/gif/freccia.png
+                title: freccia
+                style:
+                  left: 30%
+                  top: 60%
+                  width: 5%
+                  transform: rotate(50deg)
+              - type: image
+                image: /local/gif/freccia.png
+                title: freccia
+                style:
+                  left: 50%
+                  top: 65%
+                  width: 5%
+              - type: image
+                image: /local/gif/freccia.png
+                title: freccia
+                style:
+                  left: 67%
+                  top: 60%
+                  width: 5%
+                  transform: rotate(310deg)
+              - type: state-label
+                entity: sensor.somma_em06_consumi
+                style:
+                  left: 80%
+                  top: 20%
+                  font-size: 20px
+                  background-color: rgba(153, 153, 153, 0.8)
+                  color: white
+            image: /local/gif/sfondo2.png
+            grid_options:
+              columns: 12
+              rows: 6
+
+          - type: vertical-stack
+            cards:
+              - type: custom:auto-entities
+                filter:
+                  include:
+                    - options:
+                        type: custom:slider-button-card
+                      label: luce
+                  exclude: []
+                sort:
+                  reverse: false
+                  attribute: {}
+                  ip: false
+                  numeric: false
+                  ignore_case: false
+                show_empty: true
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#luci"
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - "!default"
+          - type: vertical-stack
+            cards:
+              - type: custom:auto-entities
+                filter:
+                  include:
+                    - options:
+                        type: custom:mushroom-climate-card
+                        show_temperature_control: true
+                        fill_container: true
+                        layout: vertical
+                        primary_info: name
+                        secondary_info: state
+                      label: termostato
+                      sort:
+                        method: attribute
+                        ignore_case: false
+                        numeric: false
+                  exclude: []
+                card: {}
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#termostati"
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - "!default"
+          - type: vertical-stack
+            cards:
+              - type: custom:auto-entities
+                card:
+                  type: entities
+                filter:
+                  include:
+                    - options:
+                        type: custom:mushroom-cover-card
+                        show_buttons_control: true
+                      label: tapparella
+                  exclude: []
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#tapparelle"
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - "!default"
