@@ -1,10 +1,11 @@
 kiosk_mode:
+  hide_header: true
+  ignore_disable_km: true
   user_settings:
     - users:
-        - Federica
-        - Ipad
-      hide_header: true
-      ignore_disable_km: true
+        - Andrea
+      hide_header: false
+      ignore_disable_km: false
 title: HomeTech
 path: home
 icon: mdi:home
@@ -63,13 +64,7 @@ cards:
               navigation_path: "#automazioni"
             icon: mdi:robot
             icon_color: green
-            content: >-
-              {% set entities = [
-        
-              states['switch.schedule_tapparella_sala'],
-              states['switch.schedule_tapparella_camera'],
-              states['switch.schedule_luce_ingresso']] %}{{ entities |
-              selectattr('state','eq','on') | list | count }}
+            content: 
           - type: template
             icon: mdi:leak
             icon_color: blue
@@ -106,7 +101,7 @@ cards:
           {{ states('sensor.t_u_casa_humidity') }} %
       - type: custom:swipe-card  ##meteo e alba
         parameters:
-          effect: flip
+          effect: coverflow
           autoHeight: false
           autoplay:
             delay: 5000
@@ -169,96 +164,10 @@ cards:
             type: button
             tap_action:
               action: navigate
-              navigation_path: "#j.a.r.v.i.s"
+              navigation_path: "#server"
             icon: mdi:raspberry-pi
             hold_action:
               action: none
-      - type: custom:swipe-card ##disegno esergia e calendario
-        parameters:
-          effect: coverflow
-        cards:
-          - initial_view: listWeek
-            type: calendar
-            entities:
-              - calendar.andrea
-              - calendar.condiviso
-              - calendar.federica
-              - calendar.lavoro
-          - type: picture-elements
-            elements:
-              - type: image
-                title: casa
-                image: /local/gif/home.png
-                style:
-                  left: 50.5%
-                  top: 50%
-                  width: 25%
-              - type: image
-                title: energia
-                style:
-                  left: 50%
-                  top: 12%
-                  width: 15%
-                image: /local/gif/energia.png
-              - type: state-label
-                entity: sensor.somma_em06_power
-                style:
-                  left: 50%
-                  top: 35%
-                  font-size: 20px
-              - type: image
-                image: /local/gif/freccia.png
-                title: freccia
-                style:
-                  left: 50%
-                  top: 25%
-                  width: 5%
-              - type: image
-                image: /local/gif/freccia.png
-                title: freccia
-                style:
-                  left: 30%
-                  top: 60%
-                  width: 5%
-                  transform: rotate(50deg)
-              - type: image
-                image: /local/gif/freccia.png
-                title: freccia
-                style:
-                  left: 50%
-                  top: 65%
-                  width: 5%
-              - type: image
-                image: /local/gif/freccia.png
-                title: freccia
-                style:
-                  left: 67%
-                  top: 60%
-                  width: 5%
-                  transform: rotate(310deg)
-              - type: state-label
-                entity: sensor.somma_em06_consumi
-                style:
-                  left: 80%
-                  top: 20%
-                  font-size: 20px
-                  background-color: rgba(153, 153, 153, 0.8)
-                  color: white
-            image: /local/gif/sfondo2.png
-            grid_options:
-              columns: 12
-              rows: 7
-          - type: logbook
-            target:
-              entity_id:
-                - alarm_control_panel.allarme
-              label_id:
-                - luci
-                - termostato
-                - tapparelle
-                - porta
-                - telecamera
-            hours_to_show: 24 
       - type: vertical-stack  ##porte
         cards:
           - type: vertical-stack
@@ -487,7 +396,7 @@ cards:
             columns: 2
           - type: custom:bubble-card
             card_type: pop-up
-            hash: "#j.a.r.v.i.s"
+            hash: "#server"
             margin: 7px
             width_desktop: 1000px
             show_header: false
