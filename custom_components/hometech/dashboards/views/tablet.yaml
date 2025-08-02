@@ -1,3 +1,11 @@
+kiosk_mode:
+  hide_header: true
+  ignore_disable_km: true
+  user_settings:
+    - users:
+        - Andrea
+      hide_header: false
+      ignore_disable_km: false
 title: HomeTech
 path: home
 icon: mdi:home
@@ -7,7 +15,7 @@ cards:
     square: true
     columns: 3
     cards:
-      - type: vertical-stack
+      - type: vertical-stack ##colonna 1
         cards:
           - type: custom:mushroom-template-card
             primary: >-
@@ -99,175 +107,11 @@ cards:
                     tap_action:
                       action: toggle
 
-      - type: vertical-stack
+      - type: vertical-stack ##colonna 2
         cards:
           - type: clock
             clock_size: medium
             show_seconds: true
-          - type: custom:swipe-card
-            parameters:
-              effect: coverflow
-            cards:
-              - type: calendar
-                initial_view: listWeek
-                entities:
-                  - calendar.andrea
-                  - calendar.condiviso
-                  - calendar.federica
-                  - calendar.lavoro
-              - type: logbook
-                target:
-                  entity_id:
-                    - alarm_control_panel.allarme
-                  label_id:
-                    - luci
-                    - termostato
-                    - tapparelle
-                    - porta
-                    - telecamera
-                hours_to_show: 24
-                grid_options: null
-                columns: 12
-                rows: 8
-
-      - type: vertical-stack
-        cards: 
-          - type: custom:mushroom-chips-card
-            chips:
-              - type: template
-                tap_action:
-                  action: navigate
-                  navigation_path: "#luci"
-                double_tap_action:
-                  action: perform-action
-                  target:
-                    area_id:
-                      - bagno
-                      - camera_da_letto
-                      - cucina
-                      - ingresso
-                      - lavanderia
-                      - soggiorno
-                      - balcone
-                  perform_action: light.turn_off
-                  data: {}
-                icon: mdi:lamps-outline
-                icon_color: amber
-                content: "{{ states('sensor.luci_accese') }}"
-              - type: template
-                icon: mdi:blinds-horizontal
-                icon_color: cyan
-                content: "{{ states('sensor.tapparelle_aperte') }}"
-                tap_action:
-                  action: navigate
-                  navigation_path: "#tapparelle"
-                double_tap_action:
-                  action: call-service
-                  service: cover.close_cover
-                  target:
-                    area_id:
-                      - soggiorno
-                      - camera
-              - type: template
-                icon: mdi:home-thermometer-outline
-                icon_color: orange
-                content: "{{ states('sensor.termostati_attivi') }}"
-                tap_action:
-                  action: navigate
-                  navigation_path: "#termostati"
-                double_tap_action:
-                  action: perform-action
-                  target:
-                    label_id: termostato
-                  perform_action: climate.turn_off
-                  data: {}
-              - type: template
-                tap_action:
-                  action: navigate
-                  navigation_path: "#automazioni"
-                icon: mdi:robot
-                icon_color: green
-                content: >-
-                  {% set entities = [
-                    states['switch.schedule_tapparella_sala'], 
-                    states['switch.schedule_tapparella_camera'], 
-                    states['switch.schedule_luce_ingresso']
-                  ] %} 
-                  {{ entities | selectattr('state','eq','on') | list | count }}
-              - type: template
-                icon: mdi:leak
-                icon_color: blue
-                content: ""
-                tap_action:
-                  action: navigate
-                  navigation_path: "#sensori"
-                double_tap_action:
-                  action: call-service
-                  service: switch.turn_off
-                  target:
-                    entity_id: switch.presa_smart
-            alignment: center
-
-          - type: custom:mushroom-chips-card
-            chips:
-              - type: template
-                tap_action:
-                  action: navigate
-                  navigation_path: "/energy"
-                icon: mdi:home-lightning-bolt-outline
-                icon_color: amber
-              - type: template
-                tap_action:
-                  action: navigate
-                  navigation_path: "#server"
-                icon: mdi:raspberry-pi
-              - type: template
-                tap_action:
-                  action: navigate
-                  navigation_path: /config
-                icon: mdi:cog
-                icon_color: grey
-            alignment: center
-
-          - type: custom:advanced-camera-card
-            cameras:
-              - camera_entity: camera.sala_scorrevole
-            performance:
-              features:
-                card_loading_indicator: true
-                animated_progress_indicator: true
-            live:
-              preload: false
-            menu:
-              style: hover
-              buttons:
-                expand:
-                  enabled: false
-                image:
-                  enabled: false
-                play:
-                  enabled: false
-                ptz_controls:
-                  enabled: false
-                recordings:
-                  enabled: false
-                timeline:
-                  enabled: false
-                clips:
-                  enabled: true
-                mute:
-                  enabled: false
-                iris:
-                  enabled: false
-                substreams:
-                  enabled: false
-            view:
-              triggers:
-                show_trigger_status: false
-            profiles:
-              - casting
-            folders: []
-
           - type: picture-elements
             elements:
               - type: image
@@ -332,6 +176,140 @@ cards:
             grid_options:
               columns: 12
               rows: 6
+
+      - type: vertical-stack ##colonna 3
+        cards: 
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: "#luci"
+                double_tap_action:
+                  action: perform-action
+                  target:
+                    area_id:
+                      - bagno
+                      - camera_da_letto
+                      - cucina
+                      - ingresso
+                      - lavanderia
+                      - soggiorno
+                      - balcone
+                  perform_action: light.turn_off
+                  data: {}
+                icon: mdi:lamps-outline
+                icon_color: amber
+                content: "{{ states('sensor.luci_accese') }}"
+              - type: template
+                icon: mdi:blinds-horizontal
+                icon_color: cyan
+                content: "{{ states('sensor.tapparelle_aperte') }}"
+                tap_action:
+                  action: navigate
+                  navigation_path: "#tapparelle"
+                double_tap_action:
+                  action: call-service
+                  service: cover.close_cover
+                  target:
+                    area_id:
+                      - soggiorno
+                      - camera
+              - type: template
+                icon: mdi:home-thermometer-outline
+                icon_color: orange
+                content: "{{ states('sensor.termostati_attivi') }}"
+                tap_action:
+                  action: navigate
+                  navigation_path: "#termostati"
+                double_tap_action:
+                  action: perform-action
+                  target:
+                    label_id: termostato
+                  perform_action: climate.turn_off
+                  data: {}
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: "#automazioni"
+                icon: mdi:robot
+                icon_color: green
+                content: ""
+              - type: template
+                icon: mdi:leak
+                icon_color: blue
+                content: ""
+                tap_action:
+                  action: navigate
+                  navigation_path: "#sensori"
+                double_tap_action:
+                  action: call-service
+                  service: switch.turn_off
+                  target:
+                    entity_id: switch.presa_smart
+            alignment: center
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: "/energy"
+                icon: mdi:home-lightning-bolt-outline
+                icon_color: amber
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: "#server"
+                icon: mdi:raspberry-pi
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: /config
+                icon: mdi:cog
+                icon_color: grey
+            alignment: center
+          - type: custom:advanced-camera-card
+            cameras:
+              - camera_entity: camera.sala_scorrevole
+            performance:
+              features:
+                card_loading_indicator: true
+                animated_progress_indicator: true
+            live:
+              preload: false
+            menu:
+              style: hover
+              buttons:
+                expand:
+                  enabled: false
+                image:
+                  enabled: false
+                play:
+                  enabled: false
+                ptz_controls:
+                  enabled: false
+                recordings:
+                  enabled: false
+                timeline:
+                  enabled: false
+                clips:
+                  enabled: true
+                mute:
+                  enabled: false
+                iris:
+                  enabled: false
+                substreams:
+                  enabled: false
+            view:
+              triggers:
+                show_trigger_status: false
+            profiles:
+              - casting
+            folders: []
+        
+        #################################
+        ####### Elementi nascosti #######
+        #################################
 
           - type: vertical-stack
             cards:
@@ -410,3 +388,92 @@ cards:
                 modules:
                   - HomeTech
                   - "!default"
+          - type: vertical-stack
+            cards:
+              - type: custom:scheduler-card
+                include:
+                  - alarm_control_panel
+                  - climate
+                  - cover
+                  - light
+                exclude: []
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#automazioni"
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - "!default"
+          - type: vertical-stack
+            cards:
+              - type: picture
+                image: >-
+                  https://www.pi-shop.ch/media/catalog/product/cache/1/image/363x/040ec09b1e35df139433887a97daa66f/t/h/thumbnail_11__2.jpg
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+              - type: custom:mushroom-update-card
+                entity: update.home_assistant_supervisor_update
+                fill_container: true
+                layout: horizontal
+                show_buttons_control: false
+                collapsible_controls: false
+                icon: mdi:package
+              - type: custom:mushroom-update-card
+                entity: update.home_assistant_core_update
+                fill_container: true
+                layout: horizontal
+                icon: mdi:package
+              - type: custom:mushroom-update-card
+                entity: update.home_assistant_operating_system_update
+                fill_container: true
+                layout: horizontal
+                icon: mdi:package
+              - type: tile
+                vertical: false
+                state_content: state
+                grid_options:
+                  columns: 12
+                  rows: 1
+                entity: sensor.uptime
+                name: "Tempo di accensione:"
+                features_position: bottom
+              - type: horizontal-stack
+                cards:
+                  - type: entity
+                    entity: binary_sensor.rpi_power_status
+              - square: true
+                type: grid
+                cards:
+                  - graph: line
+                    type: sensor
+                    detail: 1
+                    entity: sensor.speedtest_scarica
+                    name: "Download "
+                  - graph: line
+                    type: sensor
+                    detail: 1
+                    entity: sensor.speedtest_carica
+                    name: Upload
+                  - graph: line
+                    type: sensor
+                    detail: 1
+                    entity: sensor.speedtest_ping
+                    name: Ping
+                title: Speedtest
+                columns: 2
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#server"
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - "!default"
+
