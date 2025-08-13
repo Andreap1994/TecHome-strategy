@@ -164,6 +164,13 @@ cards:
             icon: mdi:raspberry-pi
             hold_action:
               action: none
+      - type: logbook ##registro
+        target:
+          entity_id: []
+          label_id: registro
+#################################
+####### Elementi nascosti #######
+#################################
       - type: vertical-stack  ##porte
         cards:
           - type: vertical-stack
