@@ -168,9 +168,11 @@ cards:
         target:
           entity_id: []
           label_id: registro
+
 #################################
-####### Elementi nascosti #######
+####### Elementi nascosti ####### prova
 #################################
+
       - type: vertical-stack  ##porte
         cards:
           - type: vertical-stack
