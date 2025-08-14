@@ -272,14 +272,16 @@ cards:
             modules:
               - HomeTech
               - "!default"
-      - type: vertical-stack  ## tapparelle
+      - type: vertical-stack ## tapparelle
         cards:
           - type: custom:auto-entities
             card:
               type: entities
             filter:
               include:
-                - options: {}
+                - options:
+                    type: custom:mushroom-cover-card
+                    show_buttons_control: true
                   label: tapparella
               exclude: []
           - type: custom:bubble-card
