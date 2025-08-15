@@ -108,38 +108,38 @@ cards:
                     - width: 40%
                 tap_action:
                   action: toggle
-              - type: custom:auto-entities
-                card:
-                  type: glance
-                  title: Stato rapido
-                filter:
-                  include:
-                    - options:
-                        tap_action:
-                          action: none
-                      domain: binary_sensor
-                      entity_id: /porta|finestra/
-                      state: "on"
-                    - options:
-                        tap_action:
-                          action: none
-                      domain: binary_sensor
-                      entity_id: /movimento/
-                      state: "on"
-                    - options:
-                        tap_action:
-                          action: none
-                      domain: sensor
-                      entity_id: /battery|batteria/
-                      state: <20
-                      label: entita
-                  exclude:
-                    - options: {}
-                      state: "off"
-                    - options: {}
-                      state: unavailable
-                sort:
-                  method: name
+          - type: custom:auto-entities
+            card:
+              type: glance
+              title: Stato rapido
+            filter:
+              include:
+                - options:
+                    tap_action:
+                      action: none
+                  domain: binary_sensor
+                  entity_id: /porta|finestra/
+                  state: "on"
+                - options:
+                    tap_action:
+                      action: none
+                  domain: binary_sensor
+                  entity_id: /movimento/
+                  state: "on"
+                - options:
+                    tap_action:
+                      action: none
+                  domain: sensor
+                  entity_id: /battery|batteria/
+                  state: <20
+                  label: entita
+              exclude:
+                - options: {}
+                  state: "off"
+                - options: {}
+                  state: unavailable
+            sort:
+              method: name
       - type: vertical-stack ##colonna 2
         cards:
           - type: clock
