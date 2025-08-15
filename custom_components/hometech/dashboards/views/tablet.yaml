@@ -472,4 +472,29 @@ cards:
                 modules:
                   - HomeTech
                   - "!default"
-
+          - type: vertical-stack ##sensori
+            cards:
+              - type: custom:auto-entities
+                card:
+                  type: entities
+                filter:
+                  include:
+                    - options: {}
+                      label: sensori
+                      sort:
+                        numeric: false
+                        reverse: true
+                        ignore_case: false
+                        ip: false
+                        method: friendly_name
+                  exclude: []
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: "#sensori"
+                margin: 7px
+                width_desktop: 1000px
+                show_header: false
+                button_type: name
+                modules:
+                  - HomeTech
+                  - "!default"

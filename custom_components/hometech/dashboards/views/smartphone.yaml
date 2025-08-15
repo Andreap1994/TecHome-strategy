@@ -466,7 +466,6 @@ cards:
             modules:
               - HomeTech
               - "!default"
-
       - type: vertical-stack ##sensori
         cards:
           - type: custom:auto-entities
