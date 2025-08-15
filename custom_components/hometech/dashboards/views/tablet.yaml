@@ -11,7 +11,12 @@ cards:
     square: true
     columns: 3
     cards:
-      - type: vertical-stack ##colonna 1
+
+#################################
+########### Colonna 1 ###########
+#################################
+
+      - type: vertical-stack
         cards:
           - type: custom:mushroom-template-card
             primary: >-
@@ -33,6 +38,12 @@ cards:
             secondary: >-
               Interna: {{ states('sensor.t_u_casa_temperature') }} °C | {{ states('sensor.t_u_casa_humidity') }} %
             badge_icon: ""
+          - type: heading
+            icon: ""
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: auto
           - type: custom:swipe-card
             parameters:
               effect: coverflow
@@ -140,11 +151,22 @@ cards:
                   state: unavailable
             sort:
               method: name
-      - type: vertical-stack ##colonna 2
+
+#################################
+########### Colonna 2 ###########
+#################################
+
+      - type: vertical-stack
         cards:
           - type: clock
             clock_size: medium
             show_seconds: true
+          - type: heading
+            icon: ""
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: auto
           - type: picture-elements
             elements:
               - type: image
@@ -210,7 +232,11 @@ cards:
               columns: 12
               rows: 6
 
-      - type: vertical-stack ##colonna 3
+#################################
+########### Colonna 3 ###########
+#################################
+
+      - type: vertical-stack
         cards: 
           - type: custom:mushroom-chips-card
             chips:
@@ -340,9 +366,9 @@ cards:
               - casting
             folders: []
         
-        #################################
-        ####### Elementi nascosti #######
-        #################################
+#################################
+####### Elementi nascosti #######
+#################################
 
           - type: vertical-stack
             cards:
