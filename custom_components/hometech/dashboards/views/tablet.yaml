@@ -68,72 +68,78 @@ cards:
             show_keypad: false
             layout: horizontal
           - type: grid
-            square: true
             columns: 2
-            grid_options:
-              columns: 12
-              rows: 2
+            square: false
             cards:
-              - type: vertical-stack
-                cards:
-                  - type: custom:button-card
-                    entity: lock.smart_lock_door
-                    icon: mdi:door
-                    aspect_ratio: 4/2
-                    state:
-                      - value: locked
-                        color: red
-                        name: Porta
-                      - value: unlocked
-                        color: green
-                        name: Porta
-                        icon: mdi:door-open
-                        styles:
-                          icon:
-                            - animation: blink 2s ease infinite
-                    tap_action:
-                      action: toggle
-              - type: vertical-stack
-                cards:
-                  - type: custom:button-card
-                    entity: button.ingresso_open_door
-                    icon: mdi:key-chain-variant
-                    aspect_ratio: 4/2
-                    name: Portone
-                    tap_action:
-                      action: toggle
-          - type: custom:auto-entities
-            card:
-              type: glance
-              title: Stato rapido
-            filter:
-              include:
-                - options:
-                    tap_action:
-                      action: none
-                  domain: binary_sensor
-                  entity_id: /porta|finestra/
-                  state: "on"
-                - options:
-                    tap_action:
-                      action: none
-                  domain: binary_sensor
-                  entity_id: /movimento/
-                  state: "on"
-                - options:
-                    tap_action:
-                      action: none
-                  domain: sensor
-                  entity_id: /battery|batteria/
-                  state: <20
-                  label: entita
-              exclude:
-                - options: {}
-                  state: "off"
-                - options: {}
-                  state: unavailable
-            sort:
-              method: name
+              - type: custom:button-card
+                entity: lock.smart_lock_door
+                icon: mdi:door
+                name: Porta
+                aspect_ratio: 4/2
+                styles:
+                  card:
+                    - display: flex
+                    - align-items: center
+                    - justify-content: center
+                  icon:
+                    - width: 40%
+                state:
+                  - value: locked
+                    color: red
+                  - value: unlocked
+                    color: green
+                    icon: mdi:door-open
+                    styles:
+                      icon:
+                        - animation: blink 2s ease infinite
+                tap_action:
+                  action: toggle
+              - type: custom:button-card
+                entity: button.ingresso_open_door
+                icon: mdi:key-chain-variant
+                name: Portone
+                aspect_ratio: 4/2
+                styles:
+                  card:
+                    - display: flex
+                    - align-items: center
+                    - justify-content: center
+                  icon:
+                    - width: 40%
+                tap_action:
+                  action: toggle
+              - type: custom:auto-entities
+                card:
+                  type: glance
+                  title: Stato rapido
+                filter:
+                  include:
+                    - options:
+                        tap_action:
+                          action: none
+                      domain: binary_sensor
+                      entity_id: /porta|finestra/
+                      state: "on"
+                    - options:
+                        tap_action:
+                          action: none
+                      domain: binary_sensor
+                      entity_id: /movimento/
+                      state: "on"
+                    - options:
+                        tap_action:
+                          action: none
+                      domain: sensor
+                      entity_id: /battery|batteria/
+                      state: <20
+                      label: entita
+                  exclude:
+                    - options: {}
+                      state: "off"
+                    - options: {}
+                      state: unavailable
+                sort:
+                  method: name
       - type: vertical-stack ##colonna 2
         cards:
           - type: clock
