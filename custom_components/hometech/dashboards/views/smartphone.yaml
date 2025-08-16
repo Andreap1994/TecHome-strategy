@@ -168,65 +168,49 @@ cards:
         parameters:
           effect: coverflow
         cards:
-          - type: custom:mushroom-chips-card ##consumi
-            chips:
-              - type: template
-                tap_action:
-                  action: navigate
-                  navigation_path: "#energia"
-                icon: mdi:home-lightning-bolt-outline
-                icon_color: amber
-                content: "{{ states('sensor.somma_em06_power') }}"
-              - type: template
-                tap_action:
-                  action: navigate
-                  navigation_path: "#energia"
-                icon: mdi:solar-panel-large
-                icon_color: yellow
-                content: "{{ states('sensor.somma_em06_consumi') }}"
-      - type: custom:swipe-card
-        parameters:
-          effect: coverflow
-          autoHeight: false
-          autoplay:
-            delay: 10000
-        cards:
-          - type: custom:auto-entities
-            card:
-              type: glance
-              title: Stato rapido
-            filter:
-              include:
-                - options:
-                    tap_action:
-                      action: none
-                  domain: binary_sensor
-                  entity_id: /porta|finestra/
-                  state: "on"
-                - options:
-                    tap_action:
-                      action: none
-                  domain: binary_sensor
-                  entity_id: /movimento/
-                  state: "on"
-                - options:
-                    tap_action:
-                      action: none
-                  domain: sensor
-                  entity_id: /battery|batteria/
-                  state: <20
-                  label: entita
-              exclude:
-                - options: {}
-                  state: "off"
-                - options: {}
-                  state: unavailable
-            sort:
-              method: name
-          - type: logbook
-            target:
-              entity_id: []
-              label_id: registro
+          - type: custom:swipe-card
+            parameters:
+              effect: coverflow
+              autoHeight: false
+              autoplay:
+                delay: 10000
+            cards:
+              - type: custom:auto-entities
+                card:
+                  type: glance
+                  title: Stato rapido
+                filter:
+                  include:
+                    - options:
+                        tap_action:
+                          action: none
+                      domain: binary_sensor
+                      entity_id: /porta|finestra/
+                      state: "on"
+                    - options:
+                        tap_action:
+                          action: none
+                      domain: binary_sensor
+                      entity_id: /movimento/
+                      state: "on"
+                    - options:
+                        tap_action:
+                          action: none
+                      domain: sensor
+                      entity_id: /battery|batteria/
+                      state: <20
+                      label: entita
+                  exclude:
+                    - options: {}
+                      state: "off"
+                    - options: {}
+                      state: unavailable
+                sort:
+                  method: name
+              - type: logbook
+                target:
+                  entity_id: []
+                  label_id: registro
 
 #################################
 ####### Elementi nascosti #######
