@@ -184,78 +184,46 @@ cards:
                 icon: mdi:solar-panel-large
                 icon_color: yellow
                 content: "{{ states('sensor.somma_em06_consumi') }}"
-          - type: picture-elements
-            elements:
-              - type: image
-                title: casa
-                image: /local/gif/home.png
-                style:
-                  left: 50.5%
-                  top: 50%
-                  width: 25%
-              - type: image
-                title: energia
-                style:
-                  left: 50%
-                  top: 12%
-                  width: 15%
-                image: /local/gif/energia.png
-              - type: state-label
-                entity: sensor.somma_em06_power
-                style:
-                  left: 50%
-                  top: 35%
-                  font-size: 20px
-              - type: image
-                image: /local/gif/freccia.png
-                title: freccia
-                style:
-                  left: 50%
-                  top: 25%
-                  width: 5%
-              - type: image
-                image: /local/gif/freccia.png
-                title: freccia
-                style:
-                  left: 30%
-                  top: 60%
-                  width: 5%
-                  transform: rotate(50deg)
-              - type: image
-                image: /local/gif/freccia.png
-                title: freccia
-                style:
-                  left: 50%
-                  top: 65%
-                  width: 5%
-              - type: image
-                image: /local/gif/freccia.png
-                title: freccia
-                style:
-                  left: 67%
-                  top: 60%
-                  width: 5%
-                  transform: rotate(310deg)
-              - type: state-label
-                entity: sensor.somma_em06_consumi
-                style:
-                  left: 80%
-                  top: 20%
-                  font-size: 20px
-                  background-color: rgba(153, 153, 153, 0.8)
-                  color: white
-              - type: image
-                image: /local/gif/pannelli_fotovoltici.png
-                title: pannelli fotovoltaici
-                style:
-                  left: 15%
-                  top: 85%
-                  width: 30%
-            image: /local/gif/sfondo2.png
-            grid_options:
-              columns: 12
-              rows: 7
-          - type: logbook ##registro
+      - type: custom:swipe-card
+        parameters:
+          effect: coverflow
+          autoHeight: false
+          autoplay:
+            delay: 10000
+        cards:
+          - type: custom:auto-entities
+            card:
+              type: glance
+              title: Stato rapido
+            filter:
+              include:
+                - options:
+                    tap_action:
+                      action: none
+                  domain: binary_sensor
+                  entity_id: /porta|finestra/
+                  state: "on"
+                - options:
+                    tap_action:
+                      action: none
+                  domain: binary_sensor
+                  entity_id: /movimento/
+                  state: "on"
+                - options:
+                    tap_action:
+                      action: none
+                  domain: sensor
+                  entity_id: /battery|batteria/
+                  state: <20
+                  label: entita
+              exclude:
+                - options: {}
+                  state: "off"
+                - options: {}
+                  state: unavailable
+            sort:
+              method: name
+          - type: logbook
             target:
               entity_id: []
               label_id: registro
