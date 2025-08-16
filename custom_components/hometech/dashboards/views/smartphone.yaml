@@ -11,56 +11,100 @@ cards:
     cards:
       - type: custom:mushroom-chips-card ##chips
         chips:
-          - type: template
-            tap_action:
-              action: navigate
-              navigation_path: "#luci"
-            double_tap_action:
-              action: perform-action
-              target:
-                label_id: luce
-              perform_action: light.turn_off
-              data: {}
-            icon: mdi:lamps-outline
-            icon_color: amber
-            content: "{{ states('sensor.luci_accese') }}"
-          - type: template
-            icon: mdi:blinds-horizontal
-            icon_color: cyan
-            content: "{{ states('sensor.tapparelle_aperte') }}"
-            tap_action:
-              action: navigate
-              navigation_path: "#tapparelle"
-            hold_action:
-              action: none
-            double_tap_action:
-              action: perform-action
-              target:
-                label_id: tapparella
-              perform_action: cover.close_cover
-              data: {}
-          - type: template
-            icon: mdi:home-thermometer-outline
-            icon_color: orange
-            content: "{{ states('sensor.termostati_attivi') }}"
-            tap_action:
-              action: navigate
-              navigation_path: "#termostati"
-            hold_action:
-              action: none
-            double_tap_action:
-              action: perform-action
-              target:
-                label_id: termostato
-              perform_action: climate.turn_off
-              data: {}
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.conteggio_luce
+                above: 0
+            chip:
+              type: template
+              icon: mdi:lamps-outline
+              icon_color: amber
+              content: "{{ states('sensor.luci_accese') }}"
+              tap_action:
+                action: navigate
+                navigation_path: "#luci"
+              double_tap_action:
+                action: perform-action
+                target:
+                  label_id: luce
+                perform_action: light.turn_off
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.conteggio_luce
+                below: 1
+            chip:
+              type: template
+              icon: mdi:lamps-outline
+              icon_color: disabled
+              tap_action:
+                action: none
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.conteggio_tapparelle
+                above: 0
+            chip:
+              type: template
+              icon: mdi:blinds-horizontal
+              icon_color: cyan
+              content: "{{ states('sensor.tapparelle_aperte') }}"
+              tap_action:
+                action: navigate
+                navigation_path: "#tapparelle"
+              double_tap_action:
+                action: perform-action
+                target:
+                  label_id: tapparella
+                perform_action: cover.close_cover
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.conteggio_tapparelle
+                below: 1
+            chip:
+              type: template
+              icon: mdi:blinds-horizontal
+              icon_color: disabled
+              tap_action:
+                action: none
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.conteggio_termostati
+                above: 0
+            chip:
+              type: template
+              icon: mdi:home-thermometer-outline
+              icon_color: orange
+              content: "{{ states('sensor.termostati_attivi') }}"
+              tap_action:
+                action: navigate
+                navigation_path: "#termostati"
+              double_tap_action:
+                action: perform-action
+                target:
+                  label_id: termostato
+                perform_action: climate.turn_off
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.conteggio_termostati
+                below: 1
+            chip:
+              type: template
+              icon: mdi:home-thermometer-outline
+              icon_color: disabled
+              tap_action:
+                action: none
           - type: template
             tap_action:
               action: navigate
               navigation_path: "#automazioni"
             icon: mdi:robot
             icon_color: green
-            content: 
+            content: ""
           - type: template
             icon: mdi:leak
             icon_color: blue
@@ -68,8 +112,6 @@ cards:
             tap_action:
               action: navigate
               navigation_path: "#sensori"
-            hold_action:
-              action: none
             double_tap_action:
               action: call-service
               service: switch.turn_off
