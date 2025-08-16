@@ -167,6 +167,26 @@ cards:
             grid_options:
               columns: 12
               rows: auto
+      - type: custom:swipe-card
+        parameters:
+          effect: coverflow
+        cards:
+          - type: custom:mushroom-chips-card ##consumi
+            chips:
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: "#energia"
+                icon: mdi:home-lightning-bolt-outline
+                icon_color: amber
+                content: "{{ states('sensor.somma_em06_power') }}"
+              - type: template
+                tap_action:
+                  action: navigate
+                  navigation_path: "#energia"
+                icon: mdi:solar-panel-large
+                icon_color: yellow
+                content: "{{ states('sensor.somma_em06_consumi') }}"
           - type: picture-elements
             elements:
               - type: image
@@ -178,11 +198,11 @@ cards:
                   width: 25%
               - type: image
                 title: energia
-                image: /local/gif/energia.png
                 style:
                   left: 50%
                   top: 12%
                   width: 15%
+                image: /local/gif/energia.png
               - type: state-label
                 entity: sensor.somma_em06_power
                 style:
@@ -225,13 +245,23 @@ cards:
                   left: 80%
                   top: 20%
                   font-size: 20px
-                  border-radius: 50px
-                  background-color: rgba(200, 200, 200, 0.8)
-                  color: black
+                  background-color: rgba(153, 153, 153, 0.8)
+                  color: white
+              - type: image
+                image: /local/gif/pannelli_fotovoltici.png
+                title: pannelli fotovoltaici
+                style:
+                  left: 15%
+                  top: 85%
+                  width: 30%
             image: /local/gif/sfondo2.png
             grid_options:
               columns: 12
-              rows: 6
+              rows: 7
+          - type: logbook ##registro
+            target:
+              entity_id: []
+              label_id: registro
 
 #################################
 ########### Colonna 3 ###########
