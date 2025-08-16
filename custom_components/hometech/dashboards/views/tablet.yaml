@@ -225,8 +225,9 @@ cards:
                   left: 80%
                   top: 20%
                   font-size: 20px
-                  background-color: rgba(153, 153, 153, 0.8)
-                  color: white
+                  border-radius: 50px
+                  background-color: rgba(200, 200, 200, 0.8)
+                  color: black
             image: /local/gif/sfondo2.png
             grid_options:
               columns: 12
@@ -247,14 +248,7 @@ cards:
                 double_tap_action:
                   action: perform-action
                   target:
-                    area_id:
-                      - bagno
-                      - camera_da_letto
-                      - cucina
-                      - ingresso
-                      - lavanderia
-                      - soggiorno
-                      - balcone
+                    label_id: luce
                   perform_action: light.turn_off
                   data: {}
                 icon: mdi:lamps-outline
@@ -267,13 +261,14 @@ cards:
                 tap_action:
                   action: navigate
                   navigation_path: "#tapparelle"
+                hold_action:
+                  action: none
                 double_tap_action:
-                  action: call-service
-                  service: cover.close_cover
+                  action: perform-action
                   target:
-                    area_id:
-                      - soggiorno
-                      - camera
+                    label_id: tapparella
+                  perform_action: cover.close_cover
+                  data: {}
               - type: template
                 icon: mdi:home-thermometer-outline
                 icon_color: orange
@@ -281,6 +276,8 @@ cards:
                 tap_action:
                   action: navigate
                   navigation_path: "#termostati"
+                hold_action:
+                  action: none
                 double_tap_action:
                   action: perform-action
                   target:
@@ -320,13 +317,6 @@ cards:
                   action: navigate
                   navigation_path: "#server"
                 icon: mdi:raspberry-pi
-              - type: template
-                tap_action:
-                  action: navigate
-                  navigation_path: /config
-                icon: mdi:cog
-                icon_color: grey
-            alignment: center
           - type: custom:advanced-camera-card
             cameras:
               - camera_entity: camera.sala_scorrevole
