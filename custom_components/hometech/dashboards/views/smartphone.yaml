@@ -7,9 +7,9 @@ path: home
 icon: mdi:home
 layout: vertical
 cards:
-  - type: vertical-stack
+  - type: vertical-stack ##chips
     cards:
-      - type: custom:mushroom-chips-card ##chips
+      - type: custom:mushroom-chips-card
         chips:
           - type: conditional
             conditions:
@@ -175,9 +175,8 @@ cards:
             use_browser_time: false
             time_zone: null
           - type: custom:horizon-card
-      - type: grid ##pulsanti
-        square: true
-        columns: 4
+      - square: true ##pulsanti
+        type: grid
         cards:
           - show_name: false
             show_icon: true
@@ -189,25 +188,62 @@ cards:
             hold_action:
               action: none
             entity: alarm_control_panel.allarme
-          - show_name: false
-            show_icon: true
-            type: button
+          - type: custom:button-card
+            entity: null
+            triggers_update: sensor.conteggio_serratura
+            color_type: icon
             icon: mdi:key-chain-variant
-            hold_action:
-              action: toggle
-            show_state: true
             tap_action:
-              action: navigate
-              navigation_path: "#serratura"
-          - show_name: false
-            show_icon: true
-            type: button
+              action: |
+                [[[
+                  const c = states['sensor.conteggio_serratura']?.state;
+                  return (c === '0') ? 'none' : 'navigate';
+                ]]]
+              navigation_path: |
+                [[[
+                  const c = states['sensor.conteggio_serratura']?.state;
+                  // se vuoi andare ad un anchor nella stessa vista:
+                  return (c === '0') ? null : '#serratura';
+                  // in alternativa, verso una vista specifica:
+                  // return (c === '0') ? null : '/lovelace/home#serratura';
+                ]]]
+            styles:
+              icon:
+                - color: |
+                    [[[
+                      const c = states['sensor.conteggio_serratura']?.state;
+                      return (c === '0') ? 'grey' : 'black';
+                    ]]]
+              card:
+                - height: 100px
+          - type: custom:button-card
+            entity: null
+            triggers_update: sensor.conteggio_telecamere
+            color_type: icon
+            icon: mdi:video-image
             tap_action:
-              action: navigate
-              navigation_path: "#telecamera"
-            icon: mdi:video-outline
-            hold_action:
-              action: none
+              action: |
+                [[[
+                  const c = states['sensor.conteggio_telecamere']?.state;
+                  return (c === '0') ? 'none' : 'navigate';
+                ]]]
+              navigation_path: |
+                [[[
+                  const c = states['sensor.conteggio_serratura']?.state;
+                  // se vuoi andare ad un anchor nella stessa vista:
+                  return (c === '0') ? null : '#telecamera';
+                  // in alternativa, verso una vista specifica:
+                  // return (c === '0') ? null : '/lovelace/home#serratura';
+                ]]]
+            styles:
+              icon:
+                - color: |
+                    [[[
+                      const c = states['sensor.contegggio_telecamera']?.state;
+                      return (c === '0') ? 'grey' : 'black';
+                    ]]]
+              card:
+                - height: 100px
           - show_name: false
             show_icon: true
             type: button
@@ -217,6 +253,7 @@ cards:
             icon: mdi:raspberry-pi
             hold_action:
               action: none
+        columns: 4
       - type: custom:swipe-card
         parameters:
           effect: coverflow
@@ -276,72 +313,118 @@ cards:
               - square: true
                 type: grid
                 cards:
-                  - type: vertical-stack
+                  - type: vertical-stack ##pulsanti
                     cards:
-                      - type: custom:button-card
-                        entity: lock.smart_lock_door
-                        icon: mdi:door
-                        aspect_ratio: 4/3
-                        state:
-                          - value: locked
-                            color: red
-                            name: Porta
-                          - value: unlocked
-                            color: green
-                            name: Porta
-                            icon: mdi:door-open
+                      - square: true
+                        type: grid
+                        cards:
+                          - type: custom:button-card
+                            entity: lock.smart_lock_door
+                            aspect_ratio: 1
+                            triggers_update: sensor.conteggio_porta
+                            color_type: icon
+                            icon: |
+                              [[[
+                                const c = states['sensor.conteggio_porta']?.state;
+                                return (c === '1' && entity.state === 'unlocked')
+                                  ? 'mdi:door-open'
+                                  : 'mdi:door';
+                              ]]]
+                            tap_action:
+                              action: |
+                                [[[
+                                  return (states['sensor.conteggio_porta']?.state === '0') ? 'null' : 'toggle';
+                                ]]]
                             styles:
                               icon:
-                                - animation: blink 2s ease infinite
-                        tap_action:
-                          action: toggle
-                      - type: custom:button-card
-                        entity: null
-                        icon: mdi:garage-variant
-                        aspect_ratio: 4/3
-                        name: Garage
-                        state:
-                          - value: "off"
-                            color: red
-                            name: Porta
-                          - value: "on"
-                            color: green
-                            name: Porta
-                            icon: mdi:garage-open-variant
+                                - color: |
+                                    [[[
+                                      const c = states['sensor.conteggio_porta']?.state;
+                                      if (c === '0') return 'grey';                // disattivo
+                                      return (entity.state === 'unlocked') ? 'green' : 'red';
+                                    ]]]
+                                - animation: |
+                                    [[[
+                                      const c = states['sensor.conteggio_porta']?.state;
+                                      return (c === '1' && entity.state === 'unlocked')
+                                        ? 'blink 1.4s ease-in-out infinite'
+                                        : 'none';
+                                    ]]]
+                            extra_styles: |
+                              @keyframes blink {
+                                0%, 100% { opacity: 1; }
+                                50% { opacity: 0.25; }
+                              }
+                          - type: custom:button-card
+                            entity: button.portone
+                            aspect_ratio: 1
+                            triggers_update: sensor.conteggio_portone
+                            color_type: icon
+                            icon: mdi:key-chain-variant
+                            tap_action:
+                              action: |
+                                [[[
+                                  return (states['sensor.conteggio_portone']?.state === '0') ? 'null' : 'toggle';
+                                ]]]
                             styles:
                               icon:
-                                - animation: blink 2s ease infinite
-                        tap_action:
-                          action: toggle
-                  - type: vertical-stack
-                    cards:
-                      - type: custom:button-card
-                        entity: button.portone_apri_la_porta
-                        icon: mdi:key-chain-variant
-                        aspect_ratio: 4/3
-                        name: Portone
-                        tap_action:
-                          action: toggle
-                columns: 2
-                grid_options:
-                  columns: 12
-                  rows: 2
-            card_mod:
-              style: |
-                ha-card {
-                  margin-bottom: 0px !important;
-                  padding-bottom: 0px !important;
-                }
-          - type: custom:bubble-card
-            card_type: pop-up
-            hash: "#serratura"
-            margin: 7px
-            width_desktop: 1000px
-            show_header: false
-            button_type: name
-            modules:
-              - HomeTech
-              - "!default"
+                                - color: |
+                                    [[[
+                                      const c = states['sensor.conteggio_portone']?.state;
+                                      if (c === '0') return 'grey';                // disattivo
+                                      else ('black');
+                                    ]]]
+                          - type: custom:button-card
+                            entity: null
+                            aspect_ratio: 1
+                            triggers_update: sensor.conteggio_garage
+                            color_type: icon
+                            icon: |
+                              [[[
+                                const c = states['sensor.conteggio_garage']?.state;
+                                return (c === '1' && entity.state === 'unlocked')
+                                  ? 'mdi:garage-variant'
+                                  : 'mdi:garage-variant';
+                              ]]]
+                            tap_action:
+                              action: |
+                                [[[
+                                  return (states['sensor.conteggio_garage']?.state === '0') ? 'null' : 'toggle';
+                                ]]]
+                            styles:
+                              icon:
+                                - color: |
+                                    [[[
+                                      const c = states['sensor.conteggio_garage']?.state;
+                                      if (c === '0') return 'grey';                // disattivo
+                                      return (entity.state === 'unlocked') ? 'green' : 'red';
+                                    ]]]
+                                - animation: |
+                                    [[[
+                                      const c = states['sensor.conteggio_garage']?.state;
+                                      return (c === '1' && entity.state === 'unlocked')
+                                        ? 'blink 1.4s ease-in-out infinite'
+                                        : 'none';
+                                    ]]]
+                            extra_styles: |
+                              @keyframes blink {
+                                0%, 100% { opacity: 1; }
+                                50% { opacity: 0.25; }
+                              }
+                        columns: 2
+                      - type: custom:bubble-card
+                        card_type: pop-up
+                        hash: "#serratura"
+                        margin: 7px
+                        width_desktop: 1000px
+                        show_header: false
+                        button_type: name
+                        modules:
+                          - HomeTech
+                          - "!default"
+                        margin_top_mobile: 10px
+                        margin_top_desktop: 10px
+                        styles: ""
       - type: vertical-stack ## luci
         cards:
           - type: custom:auto-entities
