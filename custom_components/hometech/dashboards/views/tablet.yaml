@@ -78,47 +78,86 @@ cards:
             icon: mdi:shield-home-outline
             show_keypad: false
             layout: horizontal
-          - type: grid
+          - square: true
+            type: grid
             columns: 2
-            square: false
             cards:
-              - type: custom:button-card
-                entity: lock.smart_lock_door
-                icon: mdi:door
-                name: Porta
-                aspect_ratio: 4/2
-                styles:
-                  card:
-                    - display: flex
-                    - align-items: center
-                    - justify-content: center
-                  icon:
-                    - width: 40%
-                state:
-                  - value: locked
-                    color: red
-                  - value: unlocked
-                    color: green
-                    icon: mdi:door-open
+              - type: vertical-stack
+                cards:
+                  - type: custom:button-card
+                    entity: lock.smart_lock_door
+                    icon: mdi:door
+                    aspect_ratio: 4/1.5
+                    styles:
+                      card:
+                        - display: flex
+                        - align-items: center
+                        - justify-content: center
+                    state:
+                      - value: locked
+                        color: red
+                        name: Porta
+                      - value: unlocked
+                        color: green
+                        name: Porta
+                        icon: mdi:door-open
+                        styles:
+                          icon:
+                            - animation: blink 2s ease infinite
+                    tap_action:
+                      action: toggle
+                  - type: custom:button-card
+                    entity: null
+                    aspect_ratio: 4/1.5
+                    triggers_update: sensor.conteggio_garage
+                    color_type: icon
+                    icon: |
+                      [[[
+                        const c = states['sensor.conteggio_garage']?.state;
+                        return (c === '1' && entity.state === 'unlocked')
+                          ? 'mdi:garage-variant'
+                          : 'mdi:garage-variant';
+                      ]]]
+                    tap_action:
+                      action: |
+                        [[[
+                          return (states['sensor.conteggio_garage']?.state === '0') ? 'null' : 'toggle';
+                        ]]]
                     styles:
                       icon:
-                        - animation: blink 2s ease infinite
-                tap_action:
-                  action: toggle
+                        - color: |
+                            [[[
+                              const c = states['sensor.conteggio_garage']?.state;
+                              if (c === '0') return 'grey';                // disattivo
+                              return (entity.state === 'unlocked') ? 'green' : 'red';
+                            ]]]
+                        - animation: |
+                            [[[
+                              const c = states['sensor.conteggio_garage']?.state;
+                              return (c === '1' && entity.state === 'unlocked')
+                                ? 'blink 1.4s ease-in-out infinite'
+                                : 'none';
+                            ]]]
+                    extra_styles: |
+                      @keyframes blink {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.25; }
+                      }
               - type: custom:button-card
                 entity: button.ingresso_open_door
                 icon: mdi:key-chain-variant
+                aspect_ratio: 4/1.5
                 name: Portone
-                aspect_ratio: 4/2
                 styles:
                   card:
                     - display: flex
                     - align-items: center
                     - justify-content: center
-                  icon:
-                    - width: 40%
                 tap_action:
                   action: toggle
+            grid_options:
+              columns: 12
+              rows: 2
 
 #################################
 ########### Colonna 2 ###########
@@ -135,50 +174,6 @@ cards:
             grid_options:
               columns: 12
               rows: auto
-          - type: custom:swipe-card
-            parameters:
-              effect: coverflow
-              autoHeight: false
-              autoplay:
-                delay: 10000
-            cards:
-              - type: custom:auto-entities
-                card:
-                  type: glance
-                  title: Stato rapido
-                filter:
-                  include:
-                    - options:
-                        tap_action:
-                          action: none
-                      domain: binary_sensor
-                      entity_id: /porta|finestra/
-                      state: "on"
-                    - options:
-                        tap_action:
-                          action: none
-                      domain: binary_sensor
-                      entity_id: /movimento/
-                      state: "on"
-                    - options:
-                        tap_action:
-                          action: none
-                      domain: sensor
-                      entity_id: /battery|batteria/
-                      state: <20
-                      label: entita
-                  exclude:
-                    - options: {}
-                      state: "off"
-                    - options: {}
-                      state: unavailable
-                sort:
-                  method: name
-              - type: logbook
-                target:
-                  entity_id: []
-                  label_id: registro
-
 
 #################################
 ########### Colonna 3 ###########
@@ -358,6 +353,49 @@ cards:
             profiles:
               - casting
             folders: []
+          - type: custom:swipe-card
+            parameters:
+              effect: coverflow
+              autoHeight: false
+              autoplay:
+                delay: 10000
+            cards:
+              - type: custom:auto-entities
+                card:
+                  type: glance
+                  title: Stato rapido
+                filter:
+                  include:
+                    - options:
+                        tap_action:
+                          action: none
+                      domain: binary_sensor
+                      entity_id: /porta|finestra/
+                      state: "on"
+                    - options:
+                        tap_action:
+                          action: none
+                      domain: binary_sensor
+                      entity_id: /movimento/
+                      state: "on"
+                    - options:
+                        tap_action:
+                          action: none
+                      domain: sensor
+                      entity_id: /battery|batteria/
+                      state: <20
+                      label: entita
+                  exclude:
+                    - options: {}
+                      state: "off"
+                    - options: {}
+                      state: unavailable
+                sort:
+                  method: name
+              - type: logbook
+                target:
+                  entity_id: []
+                  label_id: registro
         
 #################################
 ####### Elementi nascosti #######
