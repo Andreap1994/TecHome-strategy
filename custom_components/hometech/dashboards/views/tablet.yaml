@@ -44,6 +44,12 @@ cards:
             grid_options:
               columns: 12
               rows: auto
+          - type: heading
+            icon: ""
+            heading_style: subtitle
+            grid_options:
+              columns: 12
+              rows: auto
           - type: custom:swipe-card
             parameters:
               effect: coverflow
@@ -165,9 +171,12 @@ cards:
 
       - type: vertical-stack
         cards:
-          - type: clock
-            clock_size: medium
+          - clock_size: medium
             show_seconds: true
+            type: clock
+            grid_options:
+              columns: 12
+              rows: 1
           - type: heading
             icon: ""
             heading_style: subtitle
