@@ -1,3 +1,3 @@
-## HomeTech Dashboard
+## TecHome Dashboard
 
-Dashboard per Home Assistant sviluppata da HomeTech.
+Dashboard per Home Assistant sviluppata da TecHome.

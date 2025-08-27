@@ -1,8 +1,8 @@
 {
-  "name": "HomeTech Dashboard",
+  "name": "TecHome Dashboard",
   "content_in_root": false,
-  "filename": "custom_components/hometech/__init__.py",
-  "domain": "hometech",
+  "filename": "custom_components/TecHome/__init__.py",
+  "domain": "TecHome",
   "country": "IT",
   "homeassistant": "2023.0.0",
   "render_readme": true
