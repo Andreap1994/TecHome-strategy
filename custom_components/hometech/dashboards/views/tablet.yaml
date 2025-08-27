@@ -326,7 +326,7 @@ cards:
             alignment: center
           - type: custom:advanced-camera-card
             cameras:
-              - camera_entity: camera.sala_scorrevole
+              - camera_entity: camera.telecamera_1
             performance:
               features:
                 card_loading_indicator: true
