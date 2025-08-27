@@ -2,7 +2,7 @@ kiosk_mode:
   non_admin_settings:
     hide_header: true
     ignore_disable_km: true
-title: HomeTech
+title: TecHome
 path: home
 icon: mdi:home
 layout: vertical
@@ -420,7 +420,7 @@ cards:
                         show_header: false
                         button_type: name
                         modules:
-                          - HomeTech
+                          - TecHome
                           - "!default"
                         margin_top_mobile: 10px
                         margin_top_desktop: 10px
@@ -449,7 +449,7 @@ cards:
             show_header: false
             button_type: name
             modules:
-              - HomeTech
+              - TecHome
               - "!default"
       - type: vertical-stack ## tapparelle
         cards:
@@ -471,7 +471,7 @@ cards:
             show_header: false
             button_type: name
             modules:
-              - HomeTech
+              - TecHome
               - "!default"
       - type: vertical-stack  ## termostati
         cards:
@@ -500,7 +500,7 @@ cards:
             show_header: false
             button_type: name
             modules:
-              - HomeTech
+              - TecHome
               - "!default"
       - type: vertical-stack ##automazioni
         cards:
@@ -519,7 +519,7 @@ cards:
             show_header: false
             button_type: name
             modules:
-              - HomeTech
+              - TecHome
               - "!default"
       - type: vertical-stack ##server
         cards:
@@ -588,7 +588,7 @@ cards:
             show_header: false
             button_type: name
             modules:
-              - HomeTech
+              - TecHome
               - "!default"
       - type: vertical-stack ##telecamera
         cards:
@@ -643,7 +643,7 @@ cards:
             show_header: false
             button_type: name
             modules:
-              - HomeTech
+              - TecHome
               - "!default"
       - type: vertical-stack ##sensori
         cards:
@@ -669,5 +669,5 @@ cards:
             show_header: false
             button_type: name
             modules:
-              - HomeTech
+              - TecHome
               - "!default"
